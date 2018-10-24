@@ -16,12 +16,12 @@ Algoritmos disponiveis:
 algoritmo otimo = executa em tempo O(n lg(h)), n = numero de pontos, 
                                                h = numero de arestas no fecho
 """
-from . import fortune
+from . import DelaunayVoronoi
 
 # cada entrada deve ter:
 #  [ 'nome-do-modulo', 'nome-da-funcao', 'nome do algoritmo' ]
 children = [ 
-	[ 'fortune', 'Fortune', 'Fortune' ]
+	[ 'DelaunayVoronoi', 'fortune', 'Fortune+Delaunay' ]
 ]
 
 #children = algorithms

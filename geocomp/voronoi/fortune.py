@@ -6,4 +6,4 @@
 #from functools import cmp_to_key
 
 def Fortune (l):
-	pass
+	print(l)
