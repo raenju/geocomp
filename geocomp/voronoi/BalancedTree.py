@@ -1,3 +1,4 @@
+
 import math
 from .Queue import Ponto
 
@@ -166,7 +167,7 @@ class BeachLine:
 		cx = (grad1*grad2*(p.y-r.y)+grad2*(p.x+q.x)-grad1*(q.x+r.x))/(2*(grad2-grad1))
 		cy = -(cx - (p.x+q.x)/2)/grad1 + (p.y+q.y)/2
 		rad = math.sqrt((cx-p.x)*(cx-p.x)+(cy-p.y)*(cy-p.y))
-		return Ponto(cx,cy-rad)   # <<< A y-coord da linha de varredura diminui ao longo do alg
+		return Ponto(cx,cy-rad,False)   # <<< A y-coord da linha de varredura diminui ao longo do alg
 
 	# Remove a folha leaf, e as linhas de quebra referentes ao arco de leaf
 	def remove(self, leaf): 
@@ -284,6 +285,9 @@ q = Ponto(1,3)
 bl.insert(q, 4)
 q = Ponto(1,4)
 x = bl.insert(q, 5)
+
+print(x[0])
+
 leaf = x[2][2].right
 bl.remove(leaf)
 leaf2 = y[2][2].right
