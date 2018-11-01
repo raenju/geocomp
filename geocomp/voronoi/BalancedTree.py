@@ -30,7 +30,7 @@ class BeachLine:
 
 	def insertRec(self, value, node, c):
 		if node.right is None and node.left is None: # é uma folha
-			removeEvent = node.event # Armazena o evento circulo do arco
+			removeEvent = node # Armazena o evento circulo do arco
 			newnode = TNode([node.value, value])
 			newnode.parent = node.parent
 			newnode.balance = 1
@@ -69,6 +69,7 @@ class BeachLine:
 				if lp is None:
 					rleaf.event = None
 				else:
+					lp.leaf = rleaf
 					rleaf.event = lp #.y
 				#circleevents.append([cnode.value, node.value, value])
 				circleevents.append(rleaf)
@@ -87,6 +88,7 @@ class BeachLine:
 				if lp is None:
 					node.event = None
 				else:
+					lp.leaf = node
 					node.event = lp #.y
 				#circleevents.append([cnode.value, node.value, value])
 				circleevents.append(node)
@@ -197,13 +199,10 @@ class BeachLine:
 		cx = (grad1*grad2*(p.y-r.y)+grad2*(p.x+q.x)-grad1*(q.x+r.x))/(2*(grad2-grad1))
 		cy = -(cx - (p.x+q.x)/2)/grad1 + (p.y+q.y)/2
 		rad = math.sqrt((cx-p.x)*(cx-p.x)+(cy-p.y)*(cy-p.y))
-		return Ponto(cx,cy-rad,False)   # <<< A y-coord da linha de varredura diminui ao longo do alg
+		return Ponto(cx,cy-rad,isPonto=False,center=Ponto(cx,cy))   # <<< A y-coord da linha de varredura diminui ao longo do alg
 
 	# Remove a folha leaf, e as linhas de quebra referentes ao arco de leaf. c é a y-coord da linha de varredura
-	def remove(self, point, c):
-		leaf = self.search(point, c)
-		if leaf is None:
-			return None
+	def remove(self, leaf):
 		cnode = leaf
 		prox = None
 		ant = None
@@ -336,10 +335,10 @@ print(x[0])
 
 leaf = x[2][2].right
 
-print(bl.remove(leaf,5))
+print(bl.remove(leaf))
 leaf2 = y[2][2].right
 #bl.test_r2lprint()
-print(bl.remove(leaf2,5))
+print(bl.remove(leaf2))
 bl.test_r2lprint()
 
 #x^2 - 2xx0 + x0^2 - 2yy0 + y0^2 + 2yc - c^2 = 0

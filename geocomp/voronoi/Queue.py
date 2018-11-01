@@ -1,9 +1,11 @@
 class Ponto:
 	
-	def __init__(self, x, y, isPonto = True):
+	def __init__(self, x, y, isPonto = True, leaf = None, center = None):
 		self.x = x
 		self.y = y
 		self.isPonto = isPonto
+		self.leaf = leaf
+		self.center = center
 
 class Node:
 
@@ -30,7 +32,7 @@ class EventQueue:
 		if self.root is None:
 			self.root = Node(item, key)
 		else:
-			self.root = self.putRec(item, key, self.root)
+			self.putRec(item, key, self.root)
 
 	def take(self, key):
 		if self.root is None:
@@ -45,11 +47,13 @@ class EventQueue:
 				self.putRec(item, key, current.left)
 			else:
 				current.left = Node(item, key)
+			return
 		if key.y > current.key.y:
 			if current.hasRight():
 				self.putRec(item, key, current.right)
 			else:
 				current.right = Node(item, key)
+			return
 		if key.x < current.key.x:
 			if current.hasLeft():
 				self.putRec(item, key, current.left)
@@ -70,6 +74,7 @@ class EventQueue:
 					self.takeRec(key, current.left)
 			else:
 				return False
+			return
 		if key.y > current.key.y:
 			if current.hasRight():
 				if key == current.right.key:
@@ -78,6 +83,7 @@ class EventQueue:
 					self.takeRec(key, current.right)
 			else:
 				return False
+			return
 		if key.x < current.key.x:
 			if current.hasLeft():
 				if key == current.left.key:
@@ -96,10 +102,10 @@ class EventQueue:
 				return False
 
 	def takeOut(self, parent, taken):
-		if taken.hasLeft and taken.hasRight:
+		if taken.hasLeft() and taken.hasRight():
 			aux = taken.right
 			prev = taken
-			while aux.hasLeft:
+			while aux.hasLeft():
 				prev = aux
 				aux = aux.left
 			if parent.left == taken:
@@ -113,7 +119,7 @@ class EventQueue:
 				aux.right = auxr
 				self.takeOut(prev, taken)
 			if parent.right == taken:
-				parent.righth = aux
+				parent.right = aux
 				prev.left = taken
 				auxl = taken.left
 				auxr = taken.right
@@ -123,7 +129,7 @@ class EventQueue:
 				aux.right = auxr
 				self.takeOut(prev, taken)
 		else:
-			if taken.hasLeft:
+			if taken.hasLeft():
 				if parent.left == taken:
 					parent.left = taken.left
 				if parent.right == taken:
@@ -134,20 +140,29 @@ class EventQueue:
 				if parent.right == taken:
 					parent.right = taken.right
 			
-
-			
 	def takeHighest(self):
-		if self.root.hasRight:
+		if self.root.hasRight():
 			prox = None
 			parent = self.root
 			taken = self.root.right
-			while taken.hasRight:
+			while taken.hasRight():
 				parent = taken
 				taken = taken.right
-			if taken.hasLeft:
+			if taken.hasLeft():
 				prox = taken.left
 			parent.right = prox
 		else:
 			taken = self.root
 			self.root = self.root.left
 		return taken.item
+
+	def tp(self):
+		if self.root is not None:
+			self.tpr(self.root)
+
+	def tpr(self,node):
+		if node is None:
+			return
+		self.tpr(node.left)
+		print(node.item.x,node.item.y)
+		self.tpr(node.right)
