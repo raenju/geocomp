@@ -1,5 +1,6 @@
 
 import math
+import copy
 from .Queue import Ponto
 
 def area(a,b,c):
@@ -53,7 +54,7 @@ class BeachLine:
 			if self.root == node:
 				self.root = node.parent
 
-			# Encontra o 'próximo' node, para termos as duas triplas que determinam eventos-circulo
+			# Encontra o 'próximo' node, para termos as triplas que determinam eventos-circulo
 			cnode = newnode
 			circleevents = []
 			while cnode.parent is not None:
@@ -72,7 +73,7 @@ class BeachLine:
 				#circleevents.append([cnode.value, node.value, value])
 				circleevents.append(rleaf)
 
-			# Encontra o node 'anterior', para termos as duas triplas que determinam eventos-circulo
+			# Encontra o node 'anterior', para termos as triplas que determinam eventos-circulo
 			cnode = newnode
 			while cnode.parent is not None:
 				if cnode == cnode.parent.right:
@@ -122,6 +123,35 @@ class BeachLine:
 			else:
 				return self.insertRec(value, node.right, c)
 
+	def search(self, value, c):
+		if self.root is None:
+			return None
+		else:
+			return self.searchRec(value, self.root, c)
+
+	def searchRec(self,value,node,c):
+		if node.right is None and node.left is None:
+			return node
+		else:
+			p = node.value[0]
+			q = node.value[1]
+			if p.y == c:
+				if p.x > value.x:
+					return self.searchRec(value, node.left, c)
+				else:
+					return self.searchRec(value, node.right, c)
+			if q.y == c:
+				if q.x > value.x:
+					return self.searchRec(value, node.left, c)
+				else:
+					return self.searchRec(value, node.right, c)
+
+			x = self.parabolaIntersectX(p,q,c)
+			if value.x <= x:
+				return self.searchRec(value, node.left, c)
+			else:
+				return self.searchRec(value, node.right, c)
+
 	def parabolaIntersectX(self, p, q, c): # p e q são os pontos que definem as duas parabolas, c é a y-coord da linha de varredura
 		if p.y == q.y:
 			return (p.x+q.x)/2
@@ -169,8 +199,11 @@ class BeachLine:
 		rad = math.sqrt((cx-p.x)*(cx-p.x)+(cy-p.y)*(cy-p.y))
 		return Ponto(cx,cy-rad,False)   # <<< A y-coord da linha de varredura diminui ao longo do alg
 
-	# Remove a folha leaf, e as linhas de quebra referentes ao arco de leaf
-	def remove(self, leaf): 
+	# Remove a folha leaf, e as linhas de quebra referentes ao arco de leaf. c é a y-coord da linha de varredura
+	def remove(self, point, c):
+		leaf = self.search(point, c)
+		if leaf is None:
+			return None
 		cnode = leaf
 		prox = None
 		ant = None
@@ -197,7 +230,18 @@ class BeachLine:
 
 		# Os nós internos a serem removidos são (leaf.value, prox) e (ant, leaf.value)
 
-		# Ecnontra os dois nós internos que vão ser removidos, de acordo com a distancia da folha
+		pred = None
+		suc = None
+		novo = None
+
+		if prox is not None:
+			suc = [leaf.value, prox]
+		if ant is not None:
+			pred = [ant,leaf.value]
+		if ant is not None and prox is not None:
+			novo = [ant,prox]
+
+		# Encontra os dois nós internos que vão ser removidos, de acordo com a distancia da folha
 		if prox is not None and ant is not None:
 			low = None
 			high = None
@@ -257,7 +301,9 @@ class BeachLine:
 				else:
 					cnode.parent.right = nroot
 
-
+		# Retorna os nós internos das divisões que sumiram, e a divisão nova.
+		# Precisa adicionar os eventos circulo da divisão nova (novo[0], novo[1], prox(novo[1])) (ant(novo[0]),novo[0],novo[1])
+		return [pred,suc,novo]
 
 
 	def test_r2lprint(self):
@@ -289,10 +335,11 @@ x = bl.insert(q, 5)
 print(x[0])
 
 leaf = x[2][2].right
-bl.remove(leaf)
+
+print(bl.remove(leaf,5))
 leaf2 = y[2][2].right
 #bl.test_r2lprint()
-bl.remove(leaf2)
+print(bl.remove(leaf2,5))
 bl.test_r2lprint()
 
 #x^2 - 2xx0 + x0^2 - 2yy0 + y0^2 + 2yc - c^2 = 0
