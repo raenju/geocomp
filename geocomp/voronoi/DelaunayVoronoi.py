@@ -1,5 +1,9 @@
 from .BalancedTree import *
 from .Queue import *
+from geocomp.common.segment import Segment
+from geocomp.common import control
+from geocomp.common.guiprim import *
+from geocomp.common.point import Point
 
 def trataPonto(atual,Q,beach):
 	ins = beach.insert(atual,atual.y)
@@ -15,6 +19,8 @@ def trataPonto(atual,Q,beach):
  
 def trataCirculo(atual,Q,beach):
 	pred,suc,novo = beach.remove(atual.leaf)
+	print("-----")
+	beach.test_r2lprint()
 	# Atualiza Eventos ?
 	c = atual.center
 
@@ -22,12 +28,22 @@ def fortune(l):
 	Q = EventQueue()
 	Beach = BeachLine()
 	#Vor = DCEL
+	lineid = None
 	print(l)
 	for p in l:
 		Q.put(Ponto(p.x, p.y), Ponto(p.x,p.y))
-	Q.tp()
 	while Q.root is not None:
 		atual = Q.takeHighest()
+
+		# Desenha a linha de varredura
+		control.freeze_update()
+		if lineid is not None: control.plot_delete (lineid)
+		lineid = control.plot_horiz_line(atual.y)
+		control.thaw_update()
+		control.update()
+		control.sleep()
+		#
+
 		if atual.isPonto:
 			trataPonto(atual, Q, Beach)
 		else:

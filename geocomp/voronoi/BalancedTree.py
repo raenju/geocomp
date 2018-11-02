@@ -2,6 +2,7 @@
 import math
 import copy
 from .Queue import Ponto
+from geocomp.common.guiprim import *
 
 def area(a,b,c):
 	return ((a.x-c.x)*(b.y-c.y)-(a.y-c.y)*(b.x-c.x))/2
@@ -14,6 +15,9 @@ class TNode:
 		self.balance = 0
 		self.value = value # par de pontos [p,q] caso seja nó interno, e um ponto s caso seja folha
 		self.event = None # Evento circulo relacionado ao arco
+
+	def __str__(self):
+		return str(self.value.x) + " " + str(self.value.y)
 
 class BeachLine:
 	def __init__(self):
@@ -30,26 +34,42 @@ class BeachLine:
 
 	def insertRec(self, value, node, c):
 		if node.right is None and node.left is None: # é uma folha
-			removeEvent = node # Armazena o evento circulo do arco
-			newnode = TNode([node.value, value])
-			newnode.parent = node.parent
-			newnode.balance = 1
-			newnode.left = node
-			node.parent = newnode
-			if newnode.parent is not None:
-				if newnode.parent.left == node:
-					newnode.parent.left = newnode
+			if node.value.y == value.y:
+				newnode = TNode([node.value, value])
+				newnode.parent = node.parent
+				newnode.balance = 0
+				node.parent = newnode
+
+				newnode3 = TNode(value)
+				newnode3.parent = newnode
+				if node.value.x < value.x:
+					newnode.left = node
+					newnode.right = newnode3
 				else:
-					newnode.parent.right = newnode
-			newnode2 = TNode([value, node.value])
-			newnode2.parent = newnode
-			newnode.right = newnode2
-			lleaf = TNode(value)
-			rleaf = TNode(node.value)
-			lleaf.parent = newnode2
-			rleaf.parent = newnode2
-			newnode2.left = lleaf
-			newnode2.right = rleaf
+					newnode.left = newnode3
+					newnode.right = node
+				return [[], None, []]
+			else:
+				removeEvent = node # Armazena o evento circulo do arco
+				newnode = TNode([node.value, value])
+				newnode.parent = node.parent
+				newnode.balance = 1
+				newnode.left = node
+				node.parent = newnode
+				if newnode.parent is not None:
+					if newnode.parent.left == node:
+						newnode.parent.left = newnode
+					else:
+						newnode.parent.right = newnode
+				newnode2 = TNode([value, node.value])
+				newnode2.parent = newnode
+				newnode.right = newnode2
+				lleaf = TNode(value)
+				rleaf = TNode(node.value)
+				lleaf.parent = newnode2
+				rleaf.parent = newnode2
+				newnode2.left = lleaf
+				newnode2.right = rleaf
 
 			if self.root == node:
 				self.root = node.parent
@@ -71,8 +91,8 @@ class BeachLine:
 				else:
 					lp.leaf = rleaf
 					rleaf.event = lp #.y
-				#circleevents.append([cnode.value, node.value, value])
-				circleevents.append(rleaf)
+					circleevents.append(rleaf)
+					#circleevents.append([cnode.value, node.value, value])
 
 			# Encontra o node 'anterior', para termos as triplas que determinam eventos-circulo
 			cnode = newnode
@@ -90,8 +110,8 @@ class BeachLine:
 				else:
 					lp.leaf = node
 					node.event = lp #.y
-				#circleevents.append([cnode.value, node.value, value])
-				circleevents.append(node)
+					circleevents.append(node)
+					#circleevents.append([cnode.value, node.value, value])
 
 			####
 			#Propagar as mudanças de balance
@@ -245,27 +265,33 @@ class BeachLine:
 			low = None
 			high = None
 			cnode = leaf.parent
+			proxtaken = False
+			anttaken = False
 			while cnode is not None:
-				if cnode.value[0] == leaf.value and cnode.value[1] == prox:
+				if (not proxtaken) and ((cnode.value[0] == leaf.value and cnode.value[1] == prox) or (cnode.value[1] == leaf.value and cnode.value[0] == prox)):
+					proxtaken = True
 					if low is None:
 						low = cnode
 					else:
 						if high is None:
 							high = cnode
 						else:
-							print('erro? Nós internos repetidos')
-				if cnode.value[0] == ant and cnode.value[1] == leaf.value:
+							print('erro? Nós internos repetido 1')
+				if (not anttaken) and ((cnode.value[0] == ant and cnode.value[1] == leaf.value) or (cnode.value[1] == ant and cnode.value[0] == leaf.value)):
+					anttaken = True
 					if low is None:
 						low = cnode
 					else:
 						if high is None:
 							high = cnode
 						else:
-							print('erro? Nós internos repetidos')
+							print('erro? Nós internos repetidos 2')
 				cnode = cnode.parent
 
 			if low is None or high is None:
 				print('Erro. low ou high é None, ambos deviam ter valor')
+			if low is not None and high is None:
+				print(low.value[0].x,low.value[0].y,low.value[1].x,low.value[1].y)
 			high.value = [ant,prox]
 			nroot = None
 			if low.left == leaf:
