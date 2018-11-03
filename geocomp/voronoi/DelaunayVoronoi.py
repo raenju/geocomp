@@ -11,16 +11,21 @@ def trataPonto(atual,Q,beach):
 		evc = ins[0]
 		rem = ins[1]
 		arc = ins[2]
-		#Q.take(rem.event) << Ta crashando
+		if rem:
+			#Q.take(rem.event) << Ta crashando
+			print("Devia tirar um evento")
 		for ev in evc:
 			c = ev.event
-			Q.put(c,c)
+			if c.y <= atual.y:
+				Q.put(c,c)
 		# Desenhar
  
 def trataCirculo(atual,Q,beach):
 	pred,suc,novo = beach.remove(atual.leaf)
-	print("-----")
-	beach.test_r2lprint()
+	idc = control.plot_line(pred.startp.x,pred.startp.y,novo.startp.x,novo.startp.y)
+	idc = control.plot_line(suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
+	print(pred.startp.x,pred.startp.y,suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
+	#print(novo.value[0].x,novo.value[0].y,novo.value[1].x,novo.value[1].y)
 	# Atualiza Eventos ?
 	c = atual.center
 
@@ -37,7 +42,7 @@ def fortune(l):
 
 		# Desenha a linha de varredura
 		control.freeze_update()
-		if lineid is not None: control.plot_delete (lineid)
+		if lineid is not None: control.plot_delete(lineid)
 		lineid = control.plot_horiz_line(atual.y)
 		control.thaw_update()
 		control.update()
@@ -49,3 +54,5 @@ def fortune(l):
 		else:
 			trataCirculo(atual, Q, Beach)
 		#Pontos infinitos
+
+	if lineid is not None: control.plot_delete(lineid)

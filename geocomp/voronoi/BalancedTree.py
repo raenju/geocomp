@@ -15,6 +15,7 @@ class TNode:
 		self.balance = 0
 		self.value = value # par de pontos [p,q] caso seja nó interno, e um ponto s caso seja folha
 		self.event = None # Evento circulo relacionado ao arco
+		self.startp = None # Ponto inicial da linha a sr desenhada
 
 	def __str__(self):
 		return str(self.value.x) + " " + str(self.value.y)
@@ -49,27 +50,50 @@ class BeachLine:
 					newnode.left = newnode3
 					newnode.right = node
 				return [[], None, []]
-			else:
-				removeEvent = node # Armazena o evento circulo do arco
-				newnode = TNode([node.value, value])
-				newnode.parent = node.parent
-				newnode.balance = 1
-				newnode.left = node
-				node.parent = newnode
-				if newnode.parent is not None:
-					if newnode.parent.left == node:
-						newnode.parent.left = newnode
-					else:
-						newnode.parent.right = newnode
-				newnode2 = TNode([value, node.value])
-				newnode2.parent = newnode
-				newnode.right = newnode2
-				lleaf = TNode(value)
-				rleaf = TNode(node.value)
-				lleaf.parent = newnode2
-				rleaf.parent = newnode2
-				newnode2.left = lleaf
-				newnode2.right = rleaf
+
+			# p = (x0,y0)
+			# stp = (x0,y)
+			# q = node.value = (xq,yq)
+			
+			# d(p,stp)^2 = d(q,stp)^2
+
+			# (y-y0)^2 = (xq-x0)^2 + (yq-y)^2
+
+			# y^2 - 2yy0 + y0^2 = (xq-x0)^2 + yq^2 - 2yyq + y^2
+			# -2yy0 + y0^2 = (xq-x0)^2 + yq^2 - 2yyq
+
+			# 2yyq -2yy0 = (xq-x0)^2 + yq^2 - y0^2
+
+			# 2y(yq - y0) = (xq-x0)^2 + yq^2 - y0^2
+
+			# y = ((xq-x0)^2 + yq^2 - y0^2)/(2(yq - y0))
+
+			stpy = (((node.value.x-value.x)*(node.value.x-value.x)) + ((node.value.y)*(node.value.y)) - (value.y*value.y))/(2*(node.value.y - value.y))
+			stp = Ponto(value.x, stpy)
+
+			removeEvent = node # Armazena o evento circulo do arco
+			newnode = TNode([node.value, value])
+			newnode.parent = node.parent
+			newnode.balance = 1
+			newnode.left = node
+			node.parent = newnode
+			if newnode.parent is not None:
+				if newnode.parent.left == node:
+					newnode.parent.left = newnode
+				else:
+					newnode.parent.right = newnode
+			newnode2 = TNode([value, node.value])
+			newnode2.parent = newnode
+			newnode.right = newnode2
+			lleaf = TNode(value)
+			rleaf = TNode(node.value)
+			lleaf.parent = newnode2
+			rleaf.parent = newnode2
+			newnode2.left = lleaf
+			newnode2.right = rleaf
+
+			newnode.startp = stp
+			newnode2.startp = stp
 
 			if self.root == node:
 				self.root = node.parent
@@ -254,11 +278,11 @@ class BeachLine:
 		novo = None
 
 		if prox is not None:
-			suc = [leaf.value, prox]
+			suc = TNode([leaf.value, prox])
 		if ant is not None:
-			pred = [ant,leaf.value]
+			pred = TNode([ant,leaf.value])
 		if ant is not None and prox is not None:
-			novo = [ant,prox]
+			novo = TNode([ant,prox])
 
 		# Encontra os dois nós internos que vão ser removidos, de acordo com a distancia da folha
 		if prox is not None and ant is not None:
@@ -270,6 +294,7 @@ class BeachLine:
 			while cnode is not None:
 				if (not proxtaken) and ((cnode.value[0] == leaf.value and cnode.value[1] == prox) or (cnode.value[1] == leaf.value and cnode.value[0] == prox)):
 					proxtaken = True
+					suc.startp = cnode.startp
 					if low is None:
 						low = cnode
 					else:
@@ -279,6 +304,7 @@ class BeachLine:
 							print('erro? Nós internos repetido 1')
 				if (not anttaken) and ((cnode.value[0] == ant and cnode.value[1] == leaf.value) or (cnode.value[1] == ant and cnode.value[0] == leaf.value)):
 					anttaken = True
+					pred.startp = cnode.startp
 					if low is None:
 						low = cnode
 					else:
@@ -293,6 +319,8 @@ class BeachLine:
 			if low is not None and high is None:
 				print(low.value[0].x,low.value[0].y,low.value[1].x,low.value[1].y)
 			high.value = [ant,prox]
+			high.startp = leaf.event.center
+			novo.startp = leaf.event.center
 			nroot = None
 			if low.left == leaf:
 				nroot = low.right
@@ -347,25 +375,25 @@ class BeachLine:
 
 
 
-bl = BeachLine()
-p = Ponto(1,1)
-bl.insert(p, 2)
-q = Ponto(1,2)
-y = bl.insert(q, 3)
-q = Ponto(1,3)
-bl.insert(q, 4)
-q = Ponto(1,4)
-x = bl.insert(q, 5)
+# bl = BeachLine()
+# p = Ponto(1,1)
+# bl.insert(p, 2)
+# q = Ponto(1,2)
+# y = bl.insert(q, 3)
+# q = Ponto(1,3)
+# bl.insert(q, 4)
+# q = Ponto(1,4)
+# x = bl.insert(q, 5)
 
-print(x[0])
+# print(x[0])
 
-leaf = x[2][2].right
+# leaf = x[2][2].right
 
-print(bl.remove(leaf))
-leaf2 = y[2][2].right
-#bl.test_r2lprint()
-print(bl.remove(leaf2))
-bl.test_r2lprint()
+# print(bl.remove(leaf))
+# leaf2 = y[2][2].right
+# #bl.test_r2lprint()
+# print(bl.remove(leaf2))
+# bl.test_r2lprint()
 
 #x^2 - 2xx0 + x0^2 - 2yy0 + y0^2 + 2yc - c^2 = 0
 #x^2 - 2xx1 + x1^2 - 2yy1 + y1^2 + 2yc - c^2 = 0
