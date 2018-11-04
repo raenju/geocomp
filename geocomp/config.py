@@ -14,7 +14,7 @@ DELAY = 50
 MAX_DELAY = 1000
 
 # diretorio onde estao os arquivos de entrada
-DATADIR = 'dados'
+DATADIR = 'tdata'
 
 # largura de uma linha
 LINEWIDTH = 2

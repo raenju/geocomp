@@ -12,31 +12,43 @@ def trataPonto(atual,Q,beach):
 		rem = ins[1]
 		arc = ins[2]
 		if rem:
-			Q.take(rem.event)
+			Q.take(rem)
 		for ev in evc:
 			c = ev.event
-			if c.y <= atual.y:
+			if c.y <= atual.y or c.isInf:
+				control.plot_disc (c.x, c.y, config.COLOR_LINE, 5)
 				Q.put(c,c)
 		# Desenhar
  
 def trataCirculo(atual,Q,beach):
 	pred,suc,novo = beach.remove(atual.leaf)
+	#print(novo.value[0],novo.value[1])
+	#if pred.startp is None:
+	#	print("pred startp is None")
 	if pred is not None:
 		idc = control.plot_line(pred.startp.x,pred.startp.y,novo.startp.x,novo.startp.y)
+	if suc.startp is None:
+		print("suc startp is None")
 	if suc is not None:
 		idc = control.plot_line(suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
 	#print(pred.startp.x,pred.startp.y,suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
 	#print(novo.value[0].x,novo.value[0].y,novo.value[1].x,novo.value[1].y)
-	if novo is not None:
-		evc = beach.atualiza_eventos(novo)
-		for ev in evc:
-			c = ev.event
-			if c.y <= atual.y:
-				Q.put(c,c)
+	# if novo is not None:
+	# 	evc = beach.atualiza_eventos(novo)
+	# 	for ev in evc:
+	# 		c = ev.event
+	# 		if c.y <= atual.y:
+	# 			Q.put(c,c)
+	# 			control.plot_disc (c.x, c.y, config.COLOR_ALT3, 5)
 	c = atual.center
 
 def trataInf(atual,Q,beach):
 	leaf = atual.leaf
+	if leaf.event:
+		Q.take(leaf.event)
+	idc = control.plot_line(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
+	beach.remove(leaf)
+	#idc = control.plot_line(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
 
 def fortune(l):
 	Q = EventQueue()
@@ -66,21 +78,25 @@ def fortune(l):
 		atual = Q.takeHighest()
 
 		# Desenha a linha de varredura
-		control.freeze_update()
-		if lineid is not None: control.plot_delete(lineid)
-		lineid = control.plot_horiz_line(atual.y)
-		control.thaw_update()
-		control.update()
-		control.sleep()
+		if not atual.isInf:
+			control.freeze_update()
+			if lineid is not None: control.plot_delete(lineid)
+			lineid = control.plot_horiz_line(atual.y)
+			control.thaw_update()
+			control.update()
+			control.sleep()
 		#
 
 		if atual.isInf:
 			trataInf(atual, Q, Beach)
+			print("inf")
 		else:
 			if atual.isPonto:
 				trataPonto(atual, Q, Beach)
+				print("ponto")
 			else:
 				trataCirculo(atual, Q, Beach)
+				print("circ")
 		
 	if lineid is not None: control.plot_delete(lineid)
 
