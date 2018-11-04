@@ -4,6 +4,7 @@ class Ponto:
 		self.x = x
 		self.y = y
 		self.isPonto = isPonto
+		self.isInf = False
 		self.leaf = leaf
 		self.center = center
 
@@ -38,7 +39,7 @@ class EventQueue:
 		if self.root is None:
 			return False
 		else:
-			self.root = self.takeRec(key, self.root)
+			self.takeRec(key, self.root)
 
 
 	def putRec(self, item, key, current):
