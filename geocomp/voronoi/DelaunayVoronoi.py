@@ -11,6 +11,9 @@ def trataPonto(atual,Q,beach):
 		evc = ins[0]
 		rem = ins[1]
 		arc = ins[2]
+		if arc:
+			p,q = arc[0].value
+			control.plot_line(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
 		if rem:
 			Q.take(rem)
 		for ev in evc:
@@ -33,13 +36,15 @@ def trataCirculo(atual,Q,beach):
 		idc = control.plot_line(suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
 	#print(pred.startp.x,pred.startp.y,suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
 	#print(novo.value[0].x,novo.value[0].y,novo.value[1].x,novo.value[1].y)
-	# if novo is not None:
-	# 	evc = beach.atualiza_eventos(novo)
-	# 	for ev in evc:
-	# 		c = ev.event
-	# 		if c.y <= atual.y:
-	# 			Q.put(c,c)
-	# 			control.plot_disc (c.x, c.y, config.COLOR_ALT3, 5)
+	if novo is not None:
+		p,q = novo.value
+		control.plot_line(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
+		evc = beach.atualiza_eventos(novo)
+		for ev in evc:
+			c = ev.event
+			if c.y <= atual.y:
+				Q.put(c,c)
+				control.plot_disc (c.x, c.y, config.COLOR_ALT3, 5)
 	c = atual.center
 
 def trataInf(atual,Q,beach):
@@ -47,7 +52,9 @@ def trataInf(atual,Q,beach):
 	if leaf.event:
 		Q.take(leaf.event)
 	idc = control.plot_line(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
-	beach.remove(leaf)
+	a,b,c,circle = beach.removeInf(leaf)
+	for ev in circle:
+		Q.put(ev.event,ev.event)
 	#idc = control.plot_line(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
 
 def fortune(l):

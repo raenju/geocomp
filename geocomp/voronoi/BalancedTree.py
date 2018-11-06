@@ -620,31 +620,112 @@ class BeachLine:
 		return Ponto(cx,cy-rad,isPonto=False,center=Ponto(cx,cy))   # <<< A y-coord da linha de varredura diminui ao longo do alg
 
 	def removeInf(self,leaf):
-		if leaf.parent is None:
-			print("Infinito é a raiz?")
+		cnode = leaf
+		prox = None
+		proxn = None
+		ant = None
+		antn = None
+		while cnode.parent is not None:
+			if cnode == cnode.parent.left:
+				cnode = cnode.parent.right
+				while cnode.left is not None:
+					cnode = cnode.left
+				break
+			cnode = cnode.parent
+		if cnode.left is None:
+			prox = cnode.value
+			proxn = cnode
+
+		cnode = leaf
+		while cnode.parent is not None:
+			if cnode == cnode.parent.right:
+				cnode = cnode.parent.left
+				while cnode.right is not None:
+					cnode = cnode.right
+				break
+			cnode = cnode.parent
+		if cnode.right is None:
+			ant = cnode.value
+			antn = cnode
+
+		if ant == prox:
+			print('collapse')
+			if ant is None and prox is None:
+				print("----a")
+
+		pred = None
+		suc = None
+		novo = None
+
+		if prox is not None:
+			suc = TNode([leaf.value, prox])
+		if ant is not None:
+			pred = TNode([ant,leaf.value])
+		if ant is not None and prox is not None:
+			novo = TNode([antn,proxn])
+
+		if cnode == self.root:
+			print("what?")
+		if leaf == self.root:
+			print("what??")
+		cnode = leaf.parent
+		nroot = None
+		if cnode.left == leaf:
+			nroot = cnode.right
 		else:
-			if leaf.parent.left == leaf:
-				if leaf.parent == self.root:
-					self.root = leaf.parent.right
-					self.root.parent = None
-				else:
-					if leaf.parent.parent.left == leaf.parent:
-						leaf.parent.parent.left = leaf.parent.right
-						leaf.parent.right.parent = leaf.parent.parent
-						print(leaf)
-						print(leaf.parent)
-						print(leaf.parent.parent)
+			if cnode.right == leaf:
+				nroot = cnode.left
 			else:
-				if leaf.parent == self.root:
-					self.root = leaf.parent.left
-					self.root.parent = None
-				else:
-					if leaf.parent.parent.right == leaf.parent:
-						leaf.parent.parent.right = leaf.parent.left
-						leaf.parent.left.parent = leaf.parent.parent
-						print(leaf)
-						print(leaf.parent)
-						print(leaf.parent.parent)
+				print('Erro? leaf deveria ser filho de cnode')
+		if cnode == self.root:
+			self.root = nroot
+			nroot.parent = None
+		else:
+			nroot.parent = cnode.parent
+			if cnode.parent.left == cnode:
+				cnode.parent.left = nroot
+			else:
+				cnode.parent.right = nroot
+
+		circleevents = []
+		# if antn is not None:
+		# 	parent = antn.parent
+		# 	if parent is not None: #Acho que é impossivel que seja None
+		# 		p = parent.value[0]
+		# 		q = parent.value[1]
+		# 		x0 = self.bounds["maxx"]
+		# 		yv = 0
+		# 		pt = None
+		# 		if(p.y == q.y):
+		# 			pt = Ponto((p.x+q.x)/2,self.bounds["miny"])
+		# 		else:
+		# 			yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
+		# 			pt = Ponto(x0,yv,isPonto=False)
+		# 		pt.leaf = antn
+		# 		pt.isInf = True
+		# 		antn.event = pt
+		# 		antn.startp = parent.startp
+		# 		circleevents.append(antn)
+		# if proxn is not None:
+		# 	parent = proxn.parent
+		# 	if parent is not None: #Acho que é impossivel que seja None
+		# 		p = parent.value[0]
+		# 		q = parent.value[1]
+		# 		x0 = self.bounds["minx"]
+		# 		yv = 0
+		# 		pt = None
+		# 		if(p.y == q.y):
+		# 			pt = Ponto((p.x+q.x)/2,self.bounds["miny"])
+		# 		else:
+		# 			yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
+		# 			pt = Ponto(x0,yv,isPonto=False)
+		# 		pt.leaf = proxn
+		# 		pt.isInf = True
+		# 		proxn.event = pt
+		# 		proxn.startp = parent.startp
+		# 		circleevents.append(proxn)
+
+		return [pred,suc,novo,circleevents]
 
 	def remove(self, leaf):
 		cnode = leaf
@@ -774,7 +855,7 @@ class BeachLine:
 
 		# Retorna os nós internos das divisões que sumiram, e a divisão nova.
 		# Precisa adicionar os eventos circulo da divisão nova (novo[0], novo[1], prox(novo[1])) (ant(novo[0]),novo[0],novo[1])
-		return [pred,suc,novo]
+		return [pred,suc,high]
 
 	# Remove a folha leaf, e as linhas de quebra referentes ao arco de leaf. c é a y-coord da linha de varredura
 	def removeOrig(self, leaf):
@@ -914,12 +995,15 @@ class BeachLine:
 		return [pred,suc,novo]
 
 	def atualiza_eventos(self,novo):
+		print("atualiza")
 		circleevents = []
 		p = novo.value[0]
 		q = novo.value[1]
 
-		nxt = self.next_leaf(q)
-		ant = self.prev_leaf(p)
+		#nxt = self.next_leaf(q)
+		#ant = self.prev_leaf(p)
+		nxt = self.next_leaf(novo)
+		ant = self.prev_leaf(novo)
 		if (nxt is not None) and (nxt.value == p):
 			nxt = self.next_leaf(nxt)
 			ant = self.prev_leaf(ant)
@@ -928,7 +1012,7 @@ class BeachLine:
 			q = r
 		if nxt is not None:
 			q_leaf = self.prev_leaf(nxt)
-			lp = self.circleLowerPoint(nxt.value, p.value, q.value)
+			lp = self.circleLowerPoint(nxt.value, p, q)
 			if lp is None:
 				q_leaf.event = None
 			else:
@@ -937,7 +1021,7 @@ class BeachLine:
 				circleevents.append(q_leaf)
 		if ant is not None:
 			p_leaf = self.next_leaf(ant)
-			lp = self.circleLowerPoint(ant.value, p.value, q.value)
+			lp = self.circleLowerPoint(ant.value, p, q)
 			if lp is None:
 				p_leaf.event = None
 			else:
