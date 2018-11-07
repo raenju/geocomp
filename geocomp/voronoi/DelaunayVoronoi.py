@@ -7,7 +7,7 @@ from geocomp.common.point import Point
 
 def trataPonto(atual,Q,beach):
 	ins = beach.insert(atual,atual.y)
-	if ins[0]:
+	if ins:
 		evc = ins[0]
 		rem = ins[1]
 		arc = ins[2]
@@ -30,8 +30,6 @@ def trataCirculo(atual,Q,beach):
 	#	print("pred startp is None")
 	if pred is not None:
 		idc = control.plot_line(pred.startp.x,pred.startp.y,novo.startp.x,novo.startp.y)
-	if suc.startp is None:
-		print("suc startp is None")
 	if suc is not None:
 		idc = control.plot_line(suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
 	#print(pred.startp.x,pred.startp.y,suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
@@ -49,9 +47,9 @@ def trataCirculo(atual,Q,beach):
 
 def trataInf(atual,Q,beach):
 	leaf = atual.leaf
-	if leaf.event:
-		Q.take(leaf.event)
-	idc = control.plot_line(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
+	#if leaf.event:
+	#	Q.take(leaf.event)
+	#idc = control.plot_line(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
 	a,b,c,circle = beach.removeInf(leaf)
 	for ev in circle:
 		Q.put(ev.event,ev.event)

@@ -1,3 +1,10 @@
+
+from geocomp.common.segment import Segment
+from geocomp.common import control
+from geocomp.common.guiprim import *
+from geocomp.common.point import Point
+
+
 class Ponto:
 	
 	def __init__(self, x, y, isPonto = True, leaf = None, center = None):
@@ -40,6 +47,9 @@ class EventQueue:
 			return False
 		else:
 			self.takeRec(key, self.root)
+			control.plot_disc (key.x, key.y, config.COLOR_PRIM, 6)
+			print("ACÁ")
+
 
 
 	def putRec(self, item, key, current):

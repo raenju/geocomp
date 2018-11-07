@@ -85,6 +85,7 @@ class BeachLine:
 			newnode.parent = node.parent
 			newnode.balance = 1
 			newnode.left = node
+
 			node.parent = newnode
 			if newnode.parent is not None:
 				if newnode.parent.left == node:
@@ -154,13 +155,6 @@ class BeachLine:
 
 			# Encontra o node 'anterior', para termos as triplas que determinam eventos-circulo
 			cnode = newnode
-			# while cnode.parent is not None:
-			# 	if cnode == cnode.parent.right:
-			# 		cnode = cnode.parent.left
-			# 		while cnode.right is not None:
-			# 			cnode = cnode.right
-			# 		break
-			# 	cnode = cnode.parent
 			cnode = self.prev_leaf(cnode)
 			if cnode is not None:
 				lp = self.circleLowerPoint(cnode.value, node.value, value)
