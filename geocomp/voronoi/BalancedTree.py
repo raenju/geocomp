@@ -1,4 +1,3 @@
-
 import math
 import copy
 from .Queue import Ponto
@@ -29,7 +28,8 @@ class BeachLine:
 		self.bounds = None
 
 	# Encontra o 'próximo' node
-	def next_leaf(self,cnode):
+	def next_leaf(self,node):
+		cnode = node
 		while cnode.parent is not None:
 			if cnode == cnode.parent.left:
 				cnode = cnode.parent.right
@@ -42,7 +42,8 @@ class BeachLine:
 		return cnode
 
 	# Encontra o node 'anterior'
-	def prev_leaf(self,cnode):
+	def prev_leaf(self,node):
+		cnode = node
 		while cnode.parent is not None:
 			if cnode == cnode.parent.right:
 				cnode = cnode.parent.left
@@ -295,12 +296,11 @@ class BeachLine:
 		return Ponto(cx,cy-rad,isPonto=False,center=Ponto(cx,cy))   # <<< A y-coord da linha de varredura diminui ao longo do alg
 
 	def removeInf(self,leaf):
-		cnode = leaf
 		prox = None
 		proxn = None
 		ant = None
 		antn = None
-		cnode = self.next_leaf(cnode)
+		cnode = self.next_leaf(leaf)
 		# while cnode.parent is not None:
 		# 	if cnode == cnode.parent.left:
 		# 		cnode = cnode.parent.right
@@ -312,8 +312,7 @@ class BeachLine:
 			prox = cnode.value
 			proxn = cnode
 
-		cnode = leaf
-		cnode = self.prev_leaf(cnode)
+		cnode = self.prev_leaf(leaf)
 		# while cnode.parent is not None:
 		# 	if cnode == cnode.parent.right:
 		# 		cnode = cnode.parent.left
@@ -405,33 +404,17 @@ class BeachLine:
 		return [pred,suc,novo,circleevents]
 
 	def remove(self, leaf):
-		cnode = leaf
 		prox = None
 		proxn = None
 		ant = None
 		antn = None
 
-		# while cnode.parent is not None:
-		# 	if cnode == cnode.parent.left:
-		# 		cnode = cnode.parent.right
-		# 		while cnode.left is not None:
-		# 			cnode = cnode.left
-		# 		break
-		# 	cnode = cnode.parent
-		cnode = self.next_leaf(cnode)
+		cnode = self.next_leaf(leaf)
 		if cnode is not None:
 			prox = cnode.value
 			proxn = cnode
 
-		cnode = leaf
-		# while cnode.parent is not None:
-		# 	if cnode == cnode.parent.right:
-		# 		cnode = cnode.parent.left
-		# 		while cnode.right is not None:
-		# 			cnode = cnode.right
-		# 		break
-		# 	cnode = cnode.parent
-		cnode = self.prev_leaf(cnode)
+		cnode = self.prev_leaf(leaf)
 		if cnode is not None:
 			ant = cnode.value
 			antn = cnode
@@ -537,153 +520,15 @@ class BeachLine:
 		# Precisa adicionar os eventos circulo da divisão nova (novo[0], novo[1], prox(novo[1])) (ant(novo[0]),novo[0],novo[1])
 		return [pred,suc,high]
 
-	# Remove a folha leaf, e as linhas de quebra referentes ao arco de leaf. c é a y-coord da linha de varredura
-	def removeOrig(self, leaf):
-		print("removing")
-		print(leaf.value.x,leaf.value.y)
-		self.test_r2lprint()
-
-
-
-		cnode = leaf
-		prox = None
-		proxn = None
-		ant = None
-		antn = None
-		while cnode.parent is not None:
-			if cnode == cnode.parent.left:
-				cnode = cnode.parent.right
-				while cnode.left is not None:
-					cnode = cnode.left
-				break
-			cnode = cnode.parent
-		if cnode.left is None:
-			prox = cnode.value
-			proxn = cnode
-
-		cnode = leaf
-		while cnode.parent is not None:
-			if cnode == cnode.parent.right:
-				cnode = cnode.parent.left
-				while cnode.right is not None:
-					cnode = cnode.right
-				break
-			cnode = cnode.parent
-		if cnode.right is None:
-			ant = cnode.value
-			antn = cnode
-
-		if ant == prox:
-			print('collapse')
-			if ant is None and prox is None:
-				print("----a")
-			#ant = None
-			#prox = None
-
-		# Os nós internos a serem removidos são (leaf.value, prox) e (ant, leaf.value)
-
-		pred = None
-		suc = None
-		novo = None
-
-		if prox is not None:
-			suc = TNode([leaf.value, prox])
-		else:
-			print("prox is none")
-		if ant is not None:
-			pred = TNode([ant,leaf.value])
-		else:
-			print("ant is none")
-		if ant is not None and prox is not None:
-			novo = TNode([antn,proxn])
-
-		# Encontra os dois nós internos que vão ser removidos, de acordo com a distancia da folha
-		if prox is not None and ant is not None:
-			low = None
-			high = None
-			cnode = leaf.parent
-			proxtaken = False
-			anttaken = False
-			while cnode is not None:
-				if (not proxtaken) and ((cnode.value[0] == leaf.value and cnode.value[1] == prox) or (cnode.value[1] == leaf.value and cnode.value[0] == prox)):
-					proxtaken = True
-					suc.value = cnode.value
-					suc.startp = cnode.startp
-					if low is None:
-						low = cnode
-					else:
-						if high is None:
-							high = cnode
-						else:
-							print('erro? Nós internos repetido 1')
-				if (not anttaken) and ((cnode.value[0] == ant and cnode.value[1] == leaf.value) or (cnode.value[1] == ant and cnode.value[0] == leaf.value)):
-					anttaken = True
-					pred.value = cnode.value
-					pred.startp = cnode.startp
-					if low is None:
-						low = cnode
-					else:
-						if high is None:
-							high = cnode
-						else:
-							print('erro? Nós internos repetidos 2')
-				cnode = cnode.parent
-
-			if low is None or high is None:
-				print('Erro. low ou high é None, ambos deviam ter valor')
-			if low is not None and high is None:
-				print(low.value[0].x,low.value[0].y,low.value[1].x,low.value[1].y)
-			high.value = [ant,prox]
-			high.startp = leaf.event.center
-			novo.startp = leaf.event.center
-			nroot = None
-			if low.left == leaf:
-				nroot = low.right
-			else:
-				if low.right == leaf:
-					nroot = low.left
-				else:
-					print('Erro? leaf deveria ser filho de low')
-				nroot.parent = low.parent
-			if low.parent.left == low:
-				low.parent.left = nroot
-			else:
-				low.parent.right = nroot
-		else:
-			print("Devia contecer?")
-			cnode = leaf.parent
-			nroot = None
-			if cnode.left == leaf:
-				nroot = cnode.right
-			else:
-				if cnode.right == leaf:
-					nroot = cnode.left
-				else:
-					print('Erro? leaf deveria ser filho de cnode')
-			if cnode == self.root:
-				self.root = nroot
-				nroot.parent = None
-			else:
-				nroot.parent = cnode.parent
-				if cnode.parent.left == cnode:
-					cnode.parent.left = nroot
-				else:
-					cnode.parent.right = nroot
-
-		# Retorna os nós internos das divisões que sumiram, e a divisão nova.
-		# Precisa adicionar os eventos circulo da divisão nova (novo[0], novo[1], prox(novo[1])) (ant(novo[0]),novo[0],novo[1])
-		return [pred,suc,novo]
-
 	def atualiza_eventos(self,novo):
 		print("atualiza")
 		circleevents = []
 		p = novo.value[0]
 		q = novo.value[1]
 
-		#nxt = self.next_leaf(q)
-		#ant = self.prev_leaf(p)
 		nxt = self.next_leaf(novo)
 		ant = self.prev_leaf(novo)
+		stp = novo.startp
 		if (nxt is not None) and (nxt.value == p):
 			nxt = self.next_leaf(nxt)
 			ant = self.prev_leaf(ant)
@@ -697,8 +542,29 @@ class BeachLine:
 				q_leaf.event = None
 			else:
 				lp.leaf = q_leaf
-				q_leaf.event = lp #.y
+				q_leaf.event = lp
 				circleevents.append(q_leaf)
+		else:
+			y0 = self.bounds["miny"]
+			q_leaf = novo.right
+			ptc = None
+			pt = None
+			while q_leaf.left is not None:
+				q_leaf = q_leaf.left
+			if p.x == q.x:
+				ptc = Ponto(self.bounds["maxx"],(p.y+q.y)/2)
+			else:
+				x0 = (q.x*q.x + q.y*q.y - 2*y0*q.y - p.x*p.x - p.y*p.y + 2*p.y*y0)/(2*(q.x-p.x))
+				ptc = Ponto(x0,y0)
+			dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+			pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+			pt.leaf = q_leaf
+			pt.isInf = True
+			pt.center = ptc
+			q_leaf.startp = stp
+			q_leaf.event = pt
+			circleevents.append(q_leaf)
+
 		if ant is not None:
 			p_leaf = self.next_leaf(ant)
 			lp = self.circleLowerPoint(ant.value, p, q)
@@ -706,8 +572,29 @@ class BeachLine:
 				p_leaf.event = None
 			else:
 				lp.leaf = p_leaf
-				p_leaf.event = lp #.y
+				p_leaf.event = lp
 				circleevents.append(p_leaf)
+		else:
+			y0 = self.bounds["miny"]
+			p_leaf = novo.left
+			ptc = None
+			pt = None
+			while p_leaf.right is not None:
+				p_leaf = p_leaf.right
+			if p.x == q.x:
+				ptc = Ponto(self.bounds["minx"],(p.y+q.y)/2)
+			else:
+				x0 = (q.x*q.x + q.y*q.y - 2*y0*q.y - p.x*p.x - p.y*p.y + 2*p.y*y0)/(2*(q.x-p.x))
+				ptc = Ponto(x0,y0)
+			dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+			pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+			pt.leaf = p_leaf
+			pt.isInf = True
+			pt.center = ptc
+			p_leaf.startp = stp
+			p_leaf.event = pt
+			circleevents.append(p_leaf)
+
 		return circleevents
 
 	def test_r2lprint(self):
