@@ -83,7 +83,7 @@ class BeachLine:
 
 			# Armazena o evento circulo do arco
 			removeEvent = node.event
-
+			node.event = None
 			# Cria os novos nós internos e folhas da árvore
 			newnode = TNode([node.value, value])
 			newnode.parent = node.parent
@@ -124,8 +124,7 @@ class BeachLine:
 
 			# Encontra o 'próximo' node, para termos as triplas que determinam eventos-circulo
 			circleevents = []
-			cnode = newnode2
-			cnode = self.next_leaf(cnode)
+			cnode = self.next_leaf(newnode2)
 			if cnode is not None:
 				lp = self.circleLowerPoint(cnode.value, node.value, value)
 				if lp is None: # Os pontos não formam um circulo
@@ -156,8 +155,7 @@ class BeachLine:
 				circleevents.append(rleaf)
 
 			# Encontra o node 'anterior', para termos as triplas que determinam eventos-circulo
-			cnode = newnode
-			cnode = self.prev_leaf(cnode)
+			cnode = self.prev_leaf(newnode)
 			if cnode is not None:
 				lp = self.circleLowerPoint(cnode.value, node.value, value)
 				if lp is None: # Os pontos não formam um circulo
@@ -201,16 +199,16 @@ class BeachLine:
 			q = node.value[1]
 
 			# Casos degenerados - Comparar com um ponto sobre a linha de varredura
-			if p.y == c:
-				if p.x > value.x:
-					return self.insertRec(value, node.left, c)
-				else:
-					return self.insertRec(value, node.right, c)
-			if q.y == c:
-				if q.x > value.x:
-					return self.insertRec(value, node.left, c)
-				else:
-					return self.insertRec(value, node.right, c)
+			# if p.y == c:
+			# 	if p.x > value.x:
+			# 		return self.insertRec(value, node.left, c)
+			# 	else:
+			# 		return self.insertRec(value, node.right, c)
+			# if q.y == c:
+			# 	if q.x > value.x:
+			# 		return self.insertRec(value, node.left, c)
+			# 	else:
+			# 		return self.insertRec(value, node.right, c)
 			###
 
 			x = self.parabolaIntersectX(p,q,c)
@@ -249,6 +247,12 @@ class BeachLine:
 				return self.searchRec(value, node.right, c)
 
 	def parabolaIntersectX(self, p, q, c): # p e q são os pontos que definem as duas parabolas, c é a y-coord da linha de varredura
+
+		# Casos degenerados
+		if p.y == c:
+			return p.x
+		if q.y == c:
+			return q.x
 		if p.y == q.y:
 			return (p.x+q.x)/2
 		
@@ -301,25 +305,11 @@ class BeachLine:
 		ant = None
 		antn = None
 		cnode = self.next_leaf(leaf)
-		# while cnode.parent is not None:
-		# 	if cnode == cnode.parent.left:
-		# 		cnode = cnode.parent.right
-		# 		while cnode.left is not None:
-		# 			cnode = cnode.left
-		# 		break
-		# 	cnode = cnode.parent
 		if cnode is not None:
 			prox = cnode.value
 			proxn = cnode
 
 		cnode = self.prev_leaf(leaf)
-		# while cnode.parent is not None:
-		# 	if cnode == cnode.parent.right:
-		# 		cnode = cnode.parent.left
-		# 		while cnode.right is not None:
-		# 			cnode = cnode.right
-		# 		break
-		# 	cnode = cnode.parent
 		if cnode is not None:
 			ant = cnode.value
 			antn = cnode
@@ -369,36 +359,44 @@ class BeachLine:
 		# 	if parent is not None: #Acho que é impossivel que seja None
 		# 		p = parent.value[0]
 		# 		q = parent.value[1]
-		# 		x0 = self.bounds["maxx"]
-		# 		yv = 0
+		# 		stp = parent.startp
+		# 		y0 = self.bounds["miny"]
+		# 		ptc = None
 		# 		pt = None
-		# 		if(p.y == q.y):
-		# 			pt = Ponto((p.x+q.x)/2,self.bounds["miny"])
+		# 		if p.x == q.x:
+		# 			ptc = Ponto(self.bounds["maxx"],(p.y+q.y)/2)
 		# 		else:
-		# 			yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
-		# 			pt = Ponto(x0,yv,isPonto=False)
+		# 			x0 = (q.x*q.x + q.y*q.y - 2*y0*q.y - p.x*p.x - p.y*p.y + 2*p.y*y0)/(2*(q.x-p.x))
+		# 			ptc = Ponto(x0,y0)
+		# 		dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+		# 		pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
 		# 		pt.leaf = antn
 		# 		pt.isInf = True
+		# 		pt.center = ptc
+		# 		antn.startp = stp
 		# 		antn.event = pt
-		# 		antn.startp = parent.startp
 		# 		circleevents.append(antn)
 		# if proxn is not None:
 		# 	parent = proxn.parent
 		# 	if parent is not None: #Acho que é impossivel que seja None
 		# 		p = parent.value[0]
 		# 		q = parent.value[1]
-		# 		x0 = self.bounds["minx"]
-		# 		yv = 0
+		# 		stp = parent.startp
+		# 		y0 = self.bounds["miny"]
+		# 		ptc = None
 		# 		pt = None
-		# 		if(p.y == q.y):
-		# 			pt = Ponto((p.x+q.x)/2,self.bounds["miny"])
+		# 		if p.x == q.x:
+		# 			ptc = Ponto(self.bounds["minx"],(p.y+q.y)/2)
 		# 		else:
-		# 			yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
-		# 			pt = Ponto(x0,yv,isPonto=False)
+		# 			x0 = (q.x*q.x + q.y*q.y - 2*y0*q.y - p.x*p.x - p.y*p.y + 2*p.y*y0)/(2*(q.x-p.x))
+		# 			ptc = Ponto(x0,y0)
+		# 		dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+		# 		pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
 		# 		pt.leaf = proxn
 		# 		pt.isInf = True
+		# 		pt.center = ptc
+		# 		proxn.startp = stp
 		# 		proxn.event = pt
-		# 		proxn.startp = parent.startp
 		# 		circleevents.append(proxn)
 
 		return [pred,suc,novo,circleevents]

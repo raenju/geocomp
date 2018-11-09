@@ -79,6 +79,7 @@ def trataInf(atual,Q,beach):
 	st = leaf.startp
 	pt = leaf.event.center
 	idc = control.plot_line(st.x,st.y,pt.x,pt.y)
+	#print(st.x,st.y,pt.x,pt.y)
 	#idc = control.plot_line(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
 
 def fortune(l):
