@@ -20,14 +20,14 @@ def trataPonto(atual,Q,beach):
 	# arc contém uma aresta de voronoi, logo as regioes que divide são vizinhas, e existe uma aresta de delaunay entre seus pontos
 	if arcs:
 		p,q = arcs[0].value
-		control.plot_line(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
+		control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
 	# if ins[0]:
 	# 	evc = ins[0]
 	# 	rem = ins[1]
 	# 	arc = ins[2]
 	# 	if arc:
 	# 		p,q = arc[0].value
-	# 		control.plot_line(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
+	# 		control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
 	# 	if rem:
 	# 		Q.take(rem)
 	# 	for ev in evc:
@@ -43,23 +43,23 @@ def trataCirculo(atual,Q,beach):
 	#if pred.startp is None:
 	#	print("pred startp is None")
 	if pred is not None:
-		idc = control.plot_line(pred.startp.x,pred.startp.y,novo.startp.x,novo.startp.y)
+		idc = control.plot_segment(pred.startp.x,pred.startp.y,novo.startp.x,novo.startp.y)
 	if suc is not None:
-		idc = control.plot_line(suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
+		idc = control.plot_segment(suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
 
 	# if pred is not None:
 	# 	p = pred.startp
 	# 	q = pred.event.center
-	# 	idc = control.plot_line(p.x,p.y,q.x,q.y)
+	# 	idc = control.plot_segment(p.x,p.y,q.x,q.y)
 	# if suc is not None:
 	# 	p = suc.startp
 	# 	q = suc.event.center
-	# 	idc = control.plot_line(p.x,p.y,q.x,q.y)
+	# 	idc = control.plot_segment(p.x,p.y,q.x,q.y)
 	#print(pred.startp.x,pred.startp.y,suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
 	#print(novo.value[0].x,novo.value[0].y,novo.value[1].x,novo.value[1].y)
 	if novo is not None:
 		p,q = novo.value
-		control.plot_line(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
+		control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
 		evc = beach.atualiza_eventos(novo)
 		for ev in evc:
 			c = ev.event
@@ -72,15 +72,15 @@ def trataInf(atual,Q,beach):
 	leaf = atual.leaf
 	if leaf.event:
 		Q.take(leaf.event)
-	#idc = control.plot_line(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
+	#idc = control.plot_segment(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
 	a,b,c,circle = beach.removeInf(leaf)
 	for ev in circle:
 		Q.put(ev.event,ev.event)
 	st = leaf.startp
 	pt = leaf.event.center
-	idc = control.plot_line(st.x,st.y,pt.x,pt.y)
+	idc = control.plot_segment(st.x,st.y,pt.x,pt.y)
 	#print(st.x,st.y,pt.x,pt.y)
-	#idc = control.plot_line(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
+	#idc = control.plot_segment(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
 
 def fortune(l):
 	Q = EventQueue()
