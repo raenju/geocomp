@@ -112,13 +112,13 @@ def fortune(l):
 
 		# Desenha a linha de varredura e as parabolas
 		control.freeze_update()
-		if not atual.isInf:
-			if lineid is not None: control.plot_delete(lineid)
-			lineid = control.plot_horiz_line(atual.y)
+		#if not atual.isInf:
+		if lineid is not None: control.plot_delete(lineid)
+		lineid = control.plot_horiz_line(atual.y)
 		if parabola_list is not None:
 			for i in parabola_list:
 				control.plot_delete(i)
-		parabola_list = Beach.draw_parabolas(atual.y)
+		# parabola_list = Beach.draw_parabolas(atual.y)
 		# control.thaw_update()
 		# control.update()
 		# control.sleep()
@@ -134,6 +134,7 @@ def fortune(l):
 			else:
 				trataCirculo(atual, Q, Beach)
 				print("circ")
+		parabola_list = Beach.draw_parabolas(atual.y)
 		control.thaw_update()
 		control.update()
 		control.sleep()

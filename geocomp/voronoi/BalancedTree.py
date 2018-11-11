@@ -490,7 +490,7 @@ class BeachLine:
 					nroot = low.left
 				else:
 					print('Erro? leaf deveria ser filho de low')
-				nroot.parent = low.parent
+			nroot.parent = low.parent
 			if low.parent.left == low:
 				low.parent.left = nroot
 			else:
