@@ -48,7 +48,6 @@ class EventQueue:
 		else:
 			self.takeRec(key, self.root)
 			control.plot_disc (key.x, key.y, config.COLOR_PRIM, 6)
-			print("ACÁ")
 
 
 

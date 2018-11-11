@@ -140,6 +140,9 @@ def fortune(l):
 		control.sleep()
 		
 	if lineid is not None: control.plot_delete(lineid)
+	if parabola_list is not None:
+		for i in parabola_list:
+			control.plot_delete(i)
 
 max_x = None
 min_x = None

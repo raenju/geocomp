@@ -609,6 +609,7 @@ class BeachLine:
 		while nnode is not None:
 			proxx = self.parabolaIntersectX(cnode.value,nnode.value,c)
 			line_id = control.plot_parabola(c,cnode.value.x,cnode.value.y,antx,proxx)
+			#print(cnode.value.x)
 			id_list.append(line_id)
 			antx = proxx
 			cnode = nnode
