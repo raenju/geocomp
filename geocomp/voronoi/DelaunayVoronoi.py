@@ -70,7 +70,7 @@ def trataCirculo(atual,Q,beach):
 
 def trataInf(atual,Q,beach):
 	leaf = atual.leaf
-	if leaf.event:
+	if leaf.event is not None:
 		Q.take(leaf.event)
 	#idc = control.plot_segment(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
 	a,b,c,circle = beach.removeInf(leaf)
@@ -119,9 +119,9 @@ def fortune(l):
 			for i in parabola_list:
 				control.plot_delete(i)
 		parabola_list = Beach.draw_parabolas(atual.y)
-		control.thaw_update()
-		control.update()
-		control.sleep()
+		# control.thaw_update()
+		# control.update()
+		# control.sleep()
 		#
 
 		if atual.isInf:
@@ -134,6 +134,9 @@ def fortune(l):
 			else:
 				trataCirculo(atual, Q, Beach)
 				print("circ")
+		control.thaw_update()
+		control.update()
+		control.sleep()
 		
 	if lineid is not None: control.plot_delete(lineid)
 

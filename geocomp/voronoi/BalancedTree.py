@@ -257,7 +257,12 @@ class BeachLine:
 			x1,x2 = x2,x1
 
 		if x1 <= p.x and x2 <= p.x:
-			print("os dois estao antes")
+			if x1 <= q.x and x2 <= q.x:
+				print("os dois estão antes dos dois pontos")
+			if x1 <= q.x:
+				return x1
+			if x2 <= q.x:
+				return x2
 		if x1 <= p.x:
 			return x2
 		if x2 <= p.x:
@@ -628,39 +633,3 @@ class BeachLine:
 			self.test_r2lprintrec(r.left)
 			self.test_r2lprintrec(r.right)
 			return
-
-
-
-# bl = BeachLine()
-# p = Ponto(1,1)
-# bl.insert(p, 2)
-# q = Ponto(1,2)
-# y = bl.insert(q, 3)
-# q = Ponto(1,3)
-# bl.insert(q, 4)
-# q = Ponto(1,4)
-# x = bl.insert(q, 5)
-
-# print(x[0])
-
-# leaf = x[2][2].right
-
-# print(bl.remove(leaf))
-# leaf2 = y[2][2].right
-# #bl.test_r2lprint()
-# print(bl.remove(leaf2))
-# bl.test_r2lprint()
-
-#x^2 - 2xx0 + x0^2 - 2yy0 + y0^2 + 2yc - c^2 = 0
-#x^2 - 2xx1 + x1^2 - 2yy1 + y1^2 + 2yc - c^2 = 0
-
-#x^2 - 2xx0 + x0^2 + y0^2 - c^2 = 2y(y0-c)
-#x^2 - 2xx1 + x1^2 + y1^2 - c^2 = 2y(y1-c)
-
-#(x^2 - 2xx0 + x0^2 + y0^2 - c^2)/2(y0-c) = y
-#(x^2 - 2xx1 + x1^2 + y1^2 - c^2)/2(y1-c) = y
-
-
-#(x^2 - 2xx0 + x0^2 + y0^2 - c^2)/(y0-c) = (x^2 - 2xx1 + x1^2 + y1^2 - c^2)/(y1-c)
-
-#(1/(y0-c) - 1/(y1-c))x^2 + (2x1/(y1-c) - 2x0/(y0-c))x + ((x0^2+y0^2-c^2)/(y0-c) - (x1^2+y1^2-c^2)/(y1-c))
