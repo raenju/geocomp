@@ -198,19 +198,6 @@ class BeachLine:
 			p = node.value[0]
 			q = node.value[1]
 
-			# Casos degenerados - Comparar com um ponto sobre a linha de varredura
-			# if p.y == c:
-			# 	if p.x > value.x:
-			# 		return self.insertRec(value, node.left, c)
-			# 	else:
-			# 		return self.insertRec(value, node.right, c)
-			# if q.y == c:
-			# 	if q.x > value.x:
-			# 		return self.insertRec(value, node.left, c)
-			# 	else:
-			# 		return self.insertRec(value, node.right, c)
-			###
-
 			x = self.parabolaIntersectX(p,q,c)
 			if value.x <= x:
 				return self.insertRec(value, node.left, c)
@@ -594,6 +581,27 @@ class BeachLine:
 			circleevents.append(p_leaf)
 
 		return circleevents
+
+	def draw_parabolas(self, c):
+		if self.root is None:
+			return []
+		id_list = []
+		cnode = self.root
+		while cnode.left is not None:
+			cnode = cnode.left
+		antx = self.bounds["minx"]
+		nnode = self.next_leaf(cnode)
+		while nnode is not None:
+			proxx = self.parabolaIntersectX(cnode.value,nnode.value,c)
+			line_id = control.plot_parabola(c,cnode.value.x,cnode.value.y,antx,proxx)
+			id_list.append(line_id)
+			antx = proxx
+			cnode = nnode
+			nnode = self.next_leaf(nnode)
+		proxx = self.bounds["maxx"]
+		line_id = control.plot_parabola(c,cnode.value.x,cnode.value.y,antx,proxx)
+		id_list.append(line_id)
+		return id_list
 
 	def test_r2lprint(self):
 		r = self.root

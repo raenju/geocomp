@@ -116,7 +116,7 @@ def plot_parabola(y,px,py,startx,endx,steps=50,color=config.COLOR_ALT2,linewidth
 	# desenhada entre as x-coordenadas startx e endx, gerada usando número de passos steps,
 	# de cor color
 	if skip: return 0
-	plot_id = gui.plot_parabola(y,px,py,startx,endx,steps,color,linewidth)
+	plot_id = gui.plot_parabola(y,px,py,startx,endx,steps=steps,color=color,linewidth=linewidth)
 	update ()
 	return plot_id
 

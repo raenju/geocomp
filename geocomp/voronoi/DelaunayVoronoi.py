@@ -87,6 +87,7 @@ def fortune(l):
 	Beach = BeachLine()
 	#Vor = DCEL
 	lineid = None
+	parabola_list = None
 	print(l)
 	max_x = min_x = l[0].x
 	max_y = min_y = l[0].y
@@ -118,6 +119,11 @@ def fortune(l):
 			control.update()
 			control.sleep()
 		#
+
+		if parabola_list is not None:
+			for i in parabola_list:
+				control.plot_delete(i)
+		parabola_list = Beach.draw_parabolas(atual.y)
 
 		if atual.isInf:
 			trataInf(atual, Q, Beach)
