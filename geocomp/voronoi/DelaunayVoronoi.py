@@ -110,20 +110,19 @@ def fortune(l):
 	while Q.root is not None:
 		atual = Q.takeHighest()
 
-		# Desenha a linha de varredura
+		# Desenha a linha de varredura e as parabolas
+		control.freeze_update()
 		if not atual.isInf:
-			control.freeze_update()
 			if lineid is not None: control.plot_delete(lineid)
 			lineid = control.plot_horiz_line(atual.y)
-			control.thaw_update()
-			control.update()
-			control.sleep()
-		#
-
 		if parabola_list is not None:
 			for i in parabola_list:
 				control.plot_delete(i)
 		parabola_list = Beach.draw_parabolas(atual.y)
+		control.thaw_update()
+		control.update()
+		control.sleep()
+		#
 
 		if atual.isInf:
 			trataInf(atual, Q, Beach)

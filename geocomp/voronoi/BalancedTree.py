@@ -253,6 +253,16 @@ class BeachLine:
 		x1 = (-eqb + sqdelta)/(2*eqa)
 		x2 = (-eqb - sqdelta)/(2*eqa)
 
+		if x1 > x2:
+			x1,x2 = x2,x1
+
+		if x1 <= p.x and x2 <= p.x:
+			print("os dois estao antes")
+		if x1 <= p.x:
+			return x2
+		if x2 <= p.x:
+			return x1
+
 		if p.x <= q.x:
 			if p.x <= x1 and x1 <= q.x:
 				return x1
