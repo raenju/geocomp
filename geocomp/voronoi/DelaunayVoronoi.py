@@ -60,7 +60,9 @@ def trataCirculo(atual,Q,beach):
 	if novo is not None:
 		p,q = novo.value
 		control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
-		evc = beach.atualiza_eventos(novo)
+		evc,rem = beach.atualiza_eventos(novo)
+		for ev in rem:
+			Q.take(ev)
 		for ev in evc:
 			c = ev.event
 			if c.y <= atual.y:
@@ -73,7 +75,8 @@ def trataInf(atual,Q,beach):
 	if leaf.event is not None:
 		Q.take(leaf.event)
 	#idc = control.plot_segment(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
-	a,b,c,circle = beach.removeInf(leaf)
+	#a,b,c,circle = beach.removeInf(leaf)
+	circle = beach.removeInf(leaf)
 	for ev in circle:
 		Q.put(ev.event,ev.event)
 	st = leaf.startp
@@ -139,6 +142,7 @@ def fortune(l):
 		control.update()
 		control.sleep()
 		
+		#Beach.trim(atual.y)
 	if lineid is not None: control.plot_delete(lineid)
 	if parabola_list is not None:
 		for i in parabola_list:

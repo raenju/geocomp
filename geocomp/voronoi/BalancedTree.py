@@ -147,6 +147,8 @@ class BeachLine:
 					ptc = Ponto(x0,yv)
 				dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
 				pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+				if pt.y > value.y:
+					pt.y = value.y
 				pt.leaf = rleaf
 				pt.isInf = True
 				pt.center = ptc
@@ -178,6 +180,8 @@ class BeachLine:
 					ptc = Ponto(x0,yv)
 				dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
 				pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+				if pt.y > value.y:
+					pt.y = value.y
 				pt.leaf = node
 				pt.isInf = True
 				pt.center = ptc
@@ -287,6 +291,9 @@ class BeachLine:
 		return Ponto(cx,cy-rad,isPonto=False,center=Ponto(cx,cy))   # <<< A y-coord da linha de varredura diminui ao longo do alg
 
 	def removeInf(self,leaf):
+		if leaf.parent is None:
+			self.root = None
+			return []
 		prox = None
 		proxn = None
 		ant = None
@@ -305,6 +312,7 @@ class BeachLine:
 			print('collapse')
 			if ant is None and prox is None:
 				print("----a")
+				return []
 
 		pred = None
 		suc = None
@@ -386,7 +394,8 @@ class BeachLine:
 		# 		proxn.event = pt
 		# 		circleevents.append(proxn)
 
-		return [pred,suc,novo,circleevents]
+		#return [pred,suc,novo,circleevents]
+		return circleevents
 
 	def remove(self, leaf):
 		prox = None
@@ -508,6 +517,7 @@ class BeachLine:
 	def atualiza_eventos(self,novo):
 		print("atualiza")
 		circleevents = []
+		removeevents = []
 		p = novo.value[0]
 		q = novo.value[1]
 
@@ -526,12 +536,15 @@ class BeachLine:
 			if lp is None:
 				q_leaf.event = None
 			else:
+				removeevents.append(q_leaf.event)
 				lp.leaf = q_leaf
 				q_leaf.event = lp
 				circleevents.append(q_leaf)
 		else:
 			y0 = self.bounds["miny"]
 			q_leaf = novo.right
+			if q_leaf.event is not None:
+				removeevents.append(q_leaf.event)
 			ptc = None
 			pt = None
 			while q_leaf.left is not None:
@@ -556,12 +569,15 @@ class BeachLine:
 			if lp is None:
 				p_leaf.event = None
 			else:
+				removeevents.append(p_leaf.event)
 				lp.leaf = p_leaf
 				p_leaf.event = lp
 				circleevents.append(p_leaf)
 		else:
 			y0 = self.bounds["miny"]
 			p_leaf = novo.left
+			if p_leaf.event is not None:
+				removeevents.append(p_leaf.event)
 			ptc = None
 			pt = None
 			while p_leaf.right is not None:
@@ -580,7 +596,27 @@ class BeachLine:
 			p_leaf.event = pt
 			circleevents.append(p_leaf)
 
-		return circleevents
+		return circleevents,removeevents
+
+	def trim(self, c):
+		if self.root is None:
+			return
+		node = self.root
+		while node.left is not None:
+			node = node.left
+		nnode = self.next_leaf(node)
+		if nnode is not None:
+			x = self.parabolaIntersectX(node.value,nnode.value,c)
+			if x < self.bounds["minx"]:
+				self.removeInf(node)
+		node = self.root
+		while node.right is not None:
+			node = node.right
+		nnode = self.prev_leaf(node)
+		if nnode is not None:
+			x = self.parabolaIntersectX(nnode.value,node.value,c)
+			if x > self.bounds["maxx"]:
+				self.removeInf(node)
 
 	def draw_parabolas(self, c):
 		if self.root is None:
@@ -594,7 +630,7 @@ class BeachLine:
 		while nnode is not None:
 			proxx = self.parabolaIntersectX(cnode.value,nnode.value,c)
 			line_id = control.plot_parabola(c,cnode.value.x,cnode.value.y,antx,proxx)
-			#print(cnode.value.x)
+			print(cnode.value.x)
 			id_list.append(line_id)
 			antx = proxx
 			cnode = nnode
