@@ -107,12 +107,12 @@ def fortune(l):
 	yd = max_y - min_y
 	xd = max_x - min_x
 	dd = max(yd,xd)
-	mfactor = 0.7
+	mfactor = 0.6
 	bounds = {"maxx":(max_x + min_x)/2 + dd*mfactor, "minx":(max_x + min_x)/2 - dd*mfactor, "maxy":(max_y + min_y)/2 + dd*mfactor,"miny":(max_y + min_y)/2 - dd*mfactor}
 	Beach.bounds = bounds
 	while Q.root is not None:
 		atual = Q.takeHighest()
-
+		# Beach.test_r2lprint()
 		# Desenha a linha de varredura e as parabolas
 		control.freeze_update()
 		#if not atual.isInf:
@@ -128,15 +128,15 @@ def fortune(l):
 		#
 
 		if atual.isInf:
-			trataInf(atual, Q, Beach)
 			print("inf")
+			trataInf(atual, Q, Beach)
 		else:
 			if atual.isPonto:
-				trataPonto(atual, Q, Beach)
 				print("ponto")
+				trataPonto(atual, Q, Beach)
 			else:
-				trataCirculo(atual, Q, Beach)
 				print("circ")
+				trataCirculo(atual, Q, Beach)
 		parabola_list = Beach.draw_parabolas(atual.y)
 		control.thaw_update()
 		control.update()

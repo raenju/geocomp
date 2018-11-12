@@ -15,6 +15,7 @@ class TNode:
 		self.value = value # par de pontos [p,q] caso seja nó interno, e um ponto s caso seja folha
 		self.event = None # Evento circulo relacionado ao arco
 		self.startp = None # Ponto inicial da linha a ser desenhada
+		self.still = True
 
 	def __str__(self):
 		if isinstance(self.value, list):
@@ -283,6 +284,7 @@ class BeachLine:
 			aux = p
 			p = r
 			r = aux
+		# print(p.x,p.y,q.x,q.y,r.x,r.y)
 		grad1 = (q.y-p.y)/(q.x-p.x)
 		grad2 = (r.y-q.y)/(r.x-q.x)
 		cx = (grad1*grad2*(p.y-r.y)+grad2*(p.x+q.x)-grad1*(q.x+r.x))/(2*(grad2-grad1))
@@ -291,13 +293,18 @@ class BeachLine:
 		return Ponto(cx,cy-rad,isPonto=False,center=Ponto(cx,cy))   # <<< A y-coord da linha de varredura diminui ao longo do alg
 
 	def removeInf(self,leaf):
-		if leaf.parent is None:
+		if leaf == self.root:
 			self.root = None
 			return []
 		prox = None
 		proxn = None
 		ant = None
 		antn = None
+		if not leaf.still:
+			print("removeInf-leaf already removed")
+			print(leaf)
+			return []
+		leaf.still = False
 		cnode = self.next_leaf(leaf)
 		if cnode is not None:
 			prox = cnode.value
@@ -338,6 +345,8 @@ class BeachLine:
 				nroot = cnode.left
 			else:
 				print('Erro? leaf deveria ser filho de cnode')
+		# print(cnode,self.root)
+		# print(leaf)
 		if cnode == self.root:
 			self.root = nroot
 			nroot.parent = None
@@ -347,6 +356,7 @@ class BeachLine:
 				cnode.parent.left = nroot
 			else:
 				cnode.parent.right = nroot
+
 
 		circleevents = []
 		# if antn is not None:
@@ -402,7 +412,10 @@ class BeachLine:
 		proxn = None
 		ant = None
 		antn = None
-
+		if not leaf.still:
+			print("remove-leaf already removed")
+			return []
+		leaf.still = False
 		cnode = self.next_leaf(leaf)
 		if cnode is not None:
 			prox = cnode.value
@@ -428,10 +441,14 @@ class BeachLine:
 			suc = TNode([leaf.value, prox])
 		else:
 			print("prox is none")
+			print(leaf)
+			return [None,None,None]
 		if ant is not None:
 			pred = TNode([ant,leaf.value])
 		else:
 			print("ant is none")
+			print(leaf)
+			return [None,None,None]
 		if ant is not None and prox is not None:
 			novo = TNode([antn,proxn])
 
@@ -523,6 +540,15 @@ class BeachLine:
 
 		nxt = self.next_leaf(novo)
 		ant = self.prev_leaf(novo)
+		# nxt = novo.right
+		# while nxt.left is not None:
+		# 	nxt = nxt.left
+		# ant = novo.left
+		# while ant.right is not None:
+		# 	ant = ant.right
+		# nxt = self.next_leaf(nxt)
+		# ant = self.prev_leaf(ant)
+		# print(ant,nxt)
 		stp = novo.startp
 		if (nxt is not None) and (nxt.value == p):
 			nxt = self.next_leaf(nxt)
@@ -630,11 +656,16 @@ class BeachLine:
 		while nnode is not None:
 			proxx = self.parabolaIntersectX(cnode.value,nnode.value,c)
 			line_id = control.plot_parabola(c,cnode.value.x,cnode.value.y,antx,proxx)
-			print(cnode.value.x)
+			# print(cnode.value.x)
 			id_list.append(line_id)
 			antx = proxx
 			cnode = nnode
 			nnode = self.next_leaf(nnode)
+			# if cnode == nnode:
+			# 	print("ee")
+			# 	self.test_r2lprint()
+			# 	raise "Wat is happen"
+		# print(cnode.value.x)
 		proxx = self.bounds["maxx"]
 		line_id = control.plot_parabola(c,cnode.value.x,cnode.value.y,antx,proxx)
 		id_list.append(line_id)
@@ -653,5 +684,6 @@ class BeachLine:
 			return
 		else:
 			self.test_r2lprintrec(r.left)
+			print(r)
 			self.test_r2lprintrec(r.right)
 			return
