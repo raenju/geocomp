@@ -256,28 +256,13 @@ class BeachLine:
 		if x1 > x2:
 			x1,x2 = x2,x1
 
-		if x1 <= p.x and x2 <= p.x:
-			if x1 <= q.x and x2 <= q.x:
-				print("os dois estão antes dos dois pontos")
-			if x1 <= q.x:
-				return x1
-			if x2 <= q.x:
-				return x2
-		if x1 <= p.x:
-			return x2
-		if x2 <= p.x:
-			return x1
+		xm = (x1+x2)/2
+		yp = ((p.x-xm)*(p.x-xm) + p.y*p.y - c*c)/(2*(p.y-c))
+		yq = ((q.x-xm)*(q.x-xm) + q.y*q.y - c*c)/(2*(q.y-c))
 
-		if p.x <= q.x:
-			if p.x <= x1 and x1 <= q.x:
-				return x1
-			else:
-				return x2
-		else:
-			if q.x <= x1 and x1 <= p.x:
-				return x1
-			else:
-				return x2
+		if yp < yq:
+			return x2
+		return x1
 
 	def circleLowerPoint(self, p, q, r):
 		if area(p,q,r) == 0:
