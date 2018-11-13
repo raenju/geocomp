@@ -60,7 +60,7 @@ def trataCirculo(atual,Q,beach):
 	if novo is not None:
 		p,q = novo.value
 		control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
-		evc,rem = beach.atualiza_eventos(novo)
+		evc,rem = beach.atualiza_eventos(novo,atual.y,pred,suc)
 		for ev in rem:
 			Q.take(ev)
 		for ev in evc:
@@ -107,7 +107,7 @@ def fortune(l):
 	yd = max_y - min_y
 	xd = max_x - min_x
 	dd = max(yd,xd)
-	mfactor = 0.6
+	mfactor = 0.7
 	bounds = {"maxx":(max_x + min_x)/2 + dd*mfactor, "minx":(max_x + min_x)/2 - dd*mfactor, "maxy":(max_y + min_y)/2 + dd*mfactor,"miny":(max_y + min_y)/2 - dd*mfactor}
 	Beach.bounds = bounds
 	while Q.root is not None:
@@ -129,13 +129,16 @@ def fortune(l):
 
 		if atual.isInf:
 			print("inf")
+			print(atual.x,atual.y)
 			trataInf(atual, Q, Beach)
 		else:
 			if atual.isPonto:
 				print("ponto")
+				print(atual.x,atual.y)
 				trataPonto(atual, Q, Beach)
 			else:
 				print("circ")
+				print(atual.x,atual.y)
 				trataCirculo(atual, Q, Beach)
 		parabola_list = Beach.draw_parabolas(atual.y)
 		control.thaw_update()
