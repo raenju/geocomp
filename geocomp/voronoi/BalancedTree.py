@@ -642,6 +642,8 @@ class BeachLine:
 				p_leaf.event = pt
 				circleevents.append(p_leaf)
 
+		if stp.y <= self.bounds["miny"]:
+			circleevents = []
 		return circleevents,removeevents
 
 	def trim(self, c):
