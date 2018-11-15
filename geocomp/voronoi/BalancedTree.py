@@ -284,7 +284,6 @@ class BeachLine:
 			aux = p
 			p = r
 			r = aux
-		# print(p.x,p.y,q.x,q.y,r.x,r.y)
 		grad1 = (q.y-p.y)/(q.x-p.x)
 		grad2 = (r.y-q.y)/(r.x-q.x)
 		cx = (grad1*grad2*(p.y-r.y)+grad2*(p.x+q.x)-grad1*(q.x+r.x))/(2*(grad2-grad1))
@@ -345,8 +344,6 @@ class BeachLine:
 				nroot = cnode.left
 			else:
 				print('Erro? leaf deveria ser filho de cnode')
-		# print(cnode,self.root)
-		# print(leaf)
 		if cnode == self.root:
 			self.root = nroot
 			nroot.parent = None
@@ -356,56 +353,6 @@ class BeachLine:
 				cnode.parent.left = nroot
 			else:
 				cnode.parent.right = nroot
-
-
-		circleevents = []
-		# if antn is not None:
-		# 	parent = antn.parent
-		# 	if parent is not None: #Acho que é impossivel que seja None
-		# 		p = parent.value[0]
-		# 		q = parent.value[1]
-		# 		stp = parent.startp
-		# 		y0 = self.bounds["miny"]
-		# 		ptc = None
-		# 		pt = None
-		# 		if p.x == q.x:
-		# 			ptc = Ponto(self.bounds["maxx"],(p.y+q.y)/2)
-		# 		else:
-		# 			x0 = (q.x*q.x + q.y*q.y - 2*y0*q.y - p.x*p.x - p.y*p.y + 2*p.y*y0)/(2*(q.x-p.x))
-		# 			ptc = Ponto(x0,y0)
-		# 		dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-		# 		pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
-		# 		pt.leaf = antn
-		# 		pt.isInf = True
-		# 		pt.center = ptc
-		# 		antn.startp = stp
-		# 		antn.event = pt
-		# 		circleevents.append(antn)
-		# if proxn is not None:
-		# 	parent = proxn.parent
-		# 	if parent is not None: #Acho que é impossivel que seja None
-		# 		p = parent.value[0]
-		# 		q = parent.value[1]
-		# 		stp = parent.startp
-		# 		y0 = self.bounds["miny"]
-		# 		ptc = None
-		# 		pt = None
-		# 		if p.x == q.x:
-		# 			ptc = Ponto(self.bounds["minx"],(p.y+q.y)/2)
-		# 		else:
-		# 			x0 = (q.x*q.x + q.y*q.y - 2*y0*q.y - p.x*p.x - p.y*p.y + 2*p.y*y0)/(2*(q.x-p.x))
-		# 			ptc = Ponto(x0,y0)
-		# 		dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-		# 		pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
-		# 		pt.leaf = proxn
-		# 		pt.isInf = True
-		# 		pt.center = ptc
-		# 		proxn.startp = stp
-		# 		proxn.event = pt
-		# 		circleevents.append(proxn)
-
-		#return [pred,suc,novo,circleevents]
-		return circleevents
 
 	def remove(self, leaf):
 		prox = None
@@ -538,8 +485,6 @@ class BeachLine:
 		p = novo.value[0]
 		q = novo.value[1]
 
-		# nxt = self.next_leaf(novo)
-		# ant = self.prev_leaf(novo)
 		nxt = novo.right
 		while nxt.left is not None:
 			nxt = nxt.left
@@ -548,7 +493,6 @@ class BeachLine:
 			ant = ant.right
 		nxt = self.next_leaf(nxt)
 		ant = self.prev_leaf(ant)
-		# print(ant,nxt)
 		stp = novo.startp
 		if (nxt is not None) and (nxt.value == p):
 			nxt = self.next_leaf(nxt)
@@ -576,19 +520,15 @@ class BeachLine:
 				q_leaf.event = lp
 				circleevents.append(q_leaf)
 		else:
-			# y0 = self.bounds["miny"]
 			x0 = self.bounds["maxx"]
 			q_leaf = novo.right
 			while q_leaf.left is not None:
 				q_leaf = q_leaf.left
 			ptc = None
 			pt = None
-			# if p.x == q.x:
-			# 	ptc = Ponto(self.bounds["maxx"],(p.y+q.y)/2)
 			if p.y == q.y:
 				ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
 			else:
-				# x0 = (q.x*q.x + q.y*q.y - 2*y0*q.y - p.x*p.x - p.y*p.y + 2*p.y*y0)/(2*(q.x-p.x))
 				y0 = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 				ptc = Ponto(x0,y0)
 			dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
@@ -615,7 +555,6 @@ class BeachLine:
 				p_leaf.event = lp
 				circleevents.append(p_leaf)
 		else:
-			# y0 = self.bounds["miny"]
 			x0 = self.bounds["minx"]
 			p_leaf = novo.left
 			while p_leaf.right is not None:
@@ -624,10 +563,7 @@ class BeachLine:
 			pt = None
 			if p.y == q.y:
 				ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
-			# if p.x == q.x:
-			# 	ptc = Ponto(self.bounds["minx"],(p.y+q.y)/2)
 			else:
-				# x0 = (q.x*q.x + q.y*q.y - 2*y0*q.y - p.x*p.x - p.y*p.y + 2*p.y*y0)/(2*(q.x-p.x))
 				y0 = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 				ptc = Ponto(x0,y0)
 			dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
@@ -678,16 +614,10 @@ class BeachLine:
 		while nnode is not None:
 			proxx = self.parabolaIntersectX(cnode.value,nnode.value,c)
 			line_id = control.plot_parabola(c,cnode.value.x,cnode.value.y,antx,proxx)
-			# print(cnode.value.x)
 			id_list.append(line_id)
 			antx = proxx
 			cnode = nnode
 			nnode = self.next_leaf(nnode)
-			# if cnode == nnode:
-			# 	print("ee")
-			# 	self.test_r2lprint()
-			# 	raise "Wat is happen"
-		# print(cnode.value.x)
 		proxx = self.bounds["maxx"]
 		line_id = control.plot_parabola(c,cnode.value.x,cnode.value.y,antx,proxx)
 		id_list.append(line_id)

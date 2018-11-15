@@ -21,42 +21,14 @@ def trataPonto(atual,Q,beach):
 	if arcs:
 		p,q = arcs[0].value
 		control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
-	# if ins[0]:
-	# 	evc = ins[0]
-	# 	rem = ins[1]
-	# 	arc = ins[2]
-	# 	if arc:
-	# 		p,q = arc[0].value
-	# 		control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
-	# 	if rem:
-	# 		Q.take(rem)
-	# 	for ev in evc:
-	# 		c = ev.event
-	# 		if c.y <= atual.y or c.isInf:
-	# 			control.plot_disc (c.x, c.y, config.COLOR_LINE, 5)
-	# 			Q.put(c,c)
-		# Desenhar
  
 def trataCirculo(atual,Q,beach):
 	pred,suc,novo = beach.remove(atual.leaf)
-	#print(novo.value[0],novo.value[1])
-	#if pred.startp is None:
-	#	print("pred startp is None")
 	if pred is not None:
 		idc = control.plot_segment(pred.startp.x,pred.startp.y,novo.startp.x,novo.startp.y)
 	if suc is not None:
 		idc = control.plot_segment(suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
 
-	# if pred is not None:
-	# 	p = pred.startp
-	# 	q = pred.event.center
-	# 	idc = control.plot_segment(p.x,p.y,q.x,q.y)
-	# if suc is not None:
-	# 	p = suc.startp
-	# 	q = suc.event.center
-	# 	idc = control.plot_segment(p.x,p.y,q.x,q.y)
-	#print(pred.startp.x,pred.startp.y,suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
-	#print(novo.value[0].x,novo.value[0].y,novo.value[1].x,novo.value[1].y)
 	if novo is not None:
 		p,q = novo.value
 		control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
@@ -74,16 +46,10 @@ def trataInf(atual,Q,beach):
 	leaf = atual.leaf
 	if leaf.event is not None:
 		Q.take(leaf.event)
-	#idc = control.plot_segment(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
-	#a,b,c,circle = beach.removeInf(leaf)
-	circle = beach.removeInf(leaf)
-	for ev in circle:
-		Q.put(ev.event,ev.event)
+	beach.removeInf(leaf)
 	st = leaf.startp
 	pt = leaf.event.center
 	idc = control.plot_segment(st.x,st.y,pt.x,pt.y)
-	#print(st.x,st.y,pt.x,pt.y)
-	#idc = control.plot_segment(leaf.event.x,leaf.event.y,leaf.startp.x,leaf.startp.y)
 
 def fortune(l):
 	Q = EventQueue()
@@ -112,20 +78,13 @@ def fortune(l):
 	Beach.bounds = bounds
 	while Q.root is not None:
 		atual = Q.takeHighest()
-		# Beach.test_r2lprint()
 		# Desenha a linha de varredura e as parabolas
 		control.freeze_update()
-		#if not atual.isInf:
 		if lineid is not None: control.plot_delete(lineid)
 		lineid = control.plot_horiz_line(atual.y)
 		if parabola_list is not None:
 			for i in parabola_list:
 				control.plot_delete(i)
-		# parabola_list = Beach.draw_parabolas(atual.y)
-		# control.thaw_update()
-		# control.update()
-		# control.sleep()
-		#
 
 		if atual.isInf:
 			print("inf")
@@ -144,8 +103,7 @@ def fortune(l):
 		control.thaw_update()
 		control.update()
 		control.sleep()
-		
-		#Beach.trim(atual.y)
+
 	if lineid is not None: control.plot_delete(lineid)
 	if parabola_list is not None:
 		for i in parabola_list:
