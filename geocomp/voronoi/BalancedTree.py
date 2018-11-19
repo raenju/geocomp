@@ -300,8 +300,6 @@ class BeachLine:
 		ant = None
 		antn = None
 		if not leaf.still:
-			print("removeInf-leaf already removed")
-			print(leaf)
 			return []
 		leaf.still = False
 		cnode = self.next_leaf(leaf)
@@ -360,7 +358,6 @@ class BeachLine:
 		ant = None
 		antn = None
 		if not leaf.still:
-			print("remove-leaf already removed")
 			return [None, None, None]
 		leaf.still = False
 		cnode = self.next_leaf(leaf)
@@ -387,14 +384,10 @@ class BeachLine:
 		if prox is not None:
 			suc = TNode([leaf.value, prox])
 		else:
-			print("prox is none")
-			print(leaf)
 			return [None,None,None]
 		if ant is not None:
 			pred = TNode([ant,leaf.value])
 		else:
-			print("ant is none")
-			print(leaf)
 			return [None,None,None]
 		if ant is not None and prox is not None:
 			novo = TNode([antn,proxn])
@@ -435,8 +428,6 @@ class BeachLine:
 
 			if low is None or high is None:
 				print('Erro. low ou high é None, ambos deviam ter valor')
-			if low is not None and high is None:
-				print(low.value[0].x,low.value[0].y,low.value[1].x,low.value[1].y)
 			high.value = [ant,prox]
 			high.startp = leaf.event.center
 			novo.startp = leaf.event.center
@@ -479,7 +470,6 @@ class BeachLine:
 		return [pred,suc,high]
 
 	def atualiza_eventos(self,novo,liney,apred,asuc):
-		print("atualiza")
 		circleevents = []
 		removeevents = []
 		p = novo.value[0]
@@ -500,10 +490,6 @@ class BeachLine:
 			r = p
 			p = q
 			q = r
-		print(nxt)
-		print(ant)
-		print(p.x,p.y)
-		print(q.x,q.y)
 		if nxt is not None and (nxt.value == p or nxt.value == q or nxt.value == apred.value[1]):
 			nxt = None
 		if ant is not None and (ant.value == p or ant.value == q or ant.value == apred.value[1]):

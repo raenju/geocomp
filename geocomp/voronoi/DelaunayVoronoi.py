@@ -57,7 +57,6 @@ def fortune(l):
 	#Vor = DCEL
 	lineid = None
 	parabola_list = None
-	print(l)
 	max_x = min_x = l[0].x
 	max_y = min_y = l[0].y
 	for p in l:
@@ -87,17 +86,11 @@ def fortune(l):
 				control.plot_delete(i)
 
 		if atual.isInf:
-			print("inf")
-			print(atual.x,atual.y)
 			trataInf(atual, Q, Beach)
 		else:
 			if atual.isPonto:
-				print("ponto")
-				print(atual.x,atual.y)
 				trataPonto(atual, Q, Beach)
 			else:
-				print("circ")
-				print(atual.x,atual.y)
 				trataCirculo(atual, Q, Beach)
 		parabola_list = Beach.draw_parabolas(atual.y)
 		control.thaw_update()
