@@ -59,6 +59,7 @@ def fortune(l):
 	parabola_list = None
 	max_x = min_x = l[0].x
 	max_y = min_y = l[0].y
+	first_y = None
 	for p in l:
 		if p.x > max_x:
 			max_x = p.x
@@ -77,6 +78,8 @@ def fortune(l):
 	Beach.bounds = bounds
 	while Q.root is not None:
 		atual = Q.takeHighest()
+		if first_y is None:
+			first_y = atual.y
 		# Desenha a linha de varredura e as parabolas
 		control.freeze_update()
 		if lineid is not None: control.plot_delete(lineid)

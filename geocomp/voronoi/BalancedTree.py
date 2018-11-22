@@ -192,6 +192,24 @@ class BeachLine:
 
 			####
 			#Propagar as mudanças de balance
+			node = newnode
+			c_height = 2
+			while node.parent is not None:
+				if node.parent.left == node:
+					node.parent.balance = node.parent.balance - c_height
+					if node.parent.balance >= 0:
+						c_height = 0
+					else: 
+						if node.parent.balance + c_height >= 0:
+							c_height = -node.parent.balance
+				else:
+					node.parent.balance = node.parent.balance + c_height
+					if node.parent.balance <= 0:
+						c_height = 0
+					else:
+						if node.parent.balance - c_height  <= 0:
+							c_height = node.parent.balance
+				node = node.parent
 			#Balancear!!
 			####
 
@@ -208,7 +226,7 @@ class BeachLine:
 				return self.insertRec(value, node.left, c)
 			else:
 				return self.insertRec(value, node.right, c)
-
+				
 	def search(self, value, c):
 		if self.root is None:
 			return None
