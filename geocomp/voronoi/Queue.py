@@ -7,11 +7,11 @@ from geocomp.common.point import Point
 
 class Ponto:
 	
-	def __init__(self, x, y, isPonto = True, leaf = None, center = None):
+	def __init__(self, x, y, isPonto = True, leaf = None, center = None, isInf = False):
 		self.x = x
 		self.y = y
 		self.isPonto = isPonto
-		self.isInf = False
+		self.isInf = isInf
 		self.leaf = leaf
 		self.center = center
 

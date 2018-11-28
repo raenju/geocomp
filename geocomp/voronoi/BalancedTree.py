@@ -117,7 +117,7 @@ class BeachLine:
 			newnode2.startp = stp
 			#
 
-			control.plot_disc (stp.x, stp.y, config.COLOR_ALT1, 5)
+			#control.plot_disc (stp.x, stp.y, config.COLOR_ALT1, 5)
 
 			# Atualiza o apontador da raiz, caso seja necessário
 			if self.root == node:

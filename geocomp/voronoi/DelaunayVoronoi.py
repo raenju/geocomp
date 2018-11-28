@@ -1,9 +1,17 @@
 from .BalancedTree import *
 from .Queue import *
+from .dcel import *
 from geocomp.common.segment import Segment
 from geocomp.common import control
 from geocomp.common.guiprim import *
 from geocomp.common.point import Point
+
+max_x = None
+min_x = None
+max_y = None
+min_y = None
+edges = []
+
 
 def trataPonto(atual,Q,beach):
 	ins = beach.insert(atual,atual.y)
@@ -26,8 +34,10 @@ def trataCirculo(atual,Q,beach):
 	pred,suc,novo = beach.remove(atual.leaf)
 	if pred is not None:
 		idc = control.plot_segment(pred.startp.x,pred.startp.y,novo.startp.x,novo.startp.y)
+		edges.append((Ponto(pred.startp.x,pred.startp.y),Ponto(novo.startp.x,novo.startp.y)))
 	if suc is not None:
 		idc = control.plot_segment(suc.startp.x,suc.startp.y,novo.startp.x,novo.startp.y)
+		edges.append((Ponto(suc.startp.x,suc.startp.y),Ponto(novo.startp.x,novo.startp.y)))
 
 	if novo is not None:
 		p,q = novo.value
@@ -50,11 +60,12 @@ def trataInf(atual,Q,beach):
 	st = leaf.startp
 	pt = leaf.event.center
 	idc = control.plot_segment(st.x,st.y,pt.x,pt.y)
+	edges.append((Ponto(st.x,st.y),Ponto(pt.x,pt.y,isInf=True)))
 
 def fortune(l):
 	Q = EventQueue()
 	Beach = BeachLine()
-	#Vor = DCEL
+	Vor = dcel()
 	lineid = None
 	parabola_list = None
 	max_x = min_x = l[0].x
@@ -105,7 +116,5 @@ def fortune(l):
 		for i in parabola_list:
 			control.plot_delete(i)
 
-max_x = None
-min_x = None
-max_y = None
-min_y = None
+	for e in edges:
+		Vor.insere(e[0],e[1])
