@@ -59,8 +59,27 @@ def trataInf(atual,Q,beach):
 	beach.removeInf(leaf)
 	st = leaf.startp
 	pt = leaf.event.center
+	if pt.x == beach.bounds["minx"]:
+		beach.llist.append(leaf.pair)
+	elif pt.x == beach.bounds["maxx"]:
+		beach.rlist.append(leaf.pair)
+	else:
+		beach.dlist.append(leaf.pair)
 	idc = control.plot_segment(st.x,st.y,pt.x,pt.y)
 	edges.append((Ponto(st.x,st.y),Ponto(pt.x,pt.y,isInf=True)))
+
+def lineIntersect(p1,q1,p2,q2):
+	if p1.y == q1.y or q2.y == p2.y:
+		return None,None
+	xfactor = (p1.x - q1.x)/(q1.y - p1.y) - (p2.x - q2.x)/( q2.y - p2.y)
+	if xfactor == 0:
+		return None,None
+	constant = (q2.y*q2.y - p2.x*p2.x - p2.y*p2.y +  q2.x*q2.x)/(2*(q2.y - p2.y)) - (q1.y*q1.y - p1.x*p1.x - p1.y*p1.y + q1.x*q1.y)/(2*(q1.y - p1.y))
+
+	x = constant/xfactor
+	y  =  (2*(p1.x - q1.x)*x + q1.y*q1.y - p1.x*p1.x - p1.y*p1.y +  q1.x*q1.y)/(2*(q1.y - p1.y))
+
+	return x,y
 
 def fortune(l):
 	Q = EventQueue()
@@ -115,6 +134,22 @@ def fortune(l):
 	if parabola_list is not None:
 		for i in parabola_list:
 			control.plot_delete(i)
+
+	if Beach.llist:
+		for i in range(len(Beach.llist)-1):
+			p1,q1 = Beach.llist[i]
+			p2,q2 = Beach.llist[i+1]
+			x,y = lineIntersect(p1,q1,p2,q2)
+			if x is not None and x < Beach.bounds["minx"]:
+				control.plot_segment(p1.x,p1.y,q2.x,q2.y,color=config.COLOR_LINE_SPECIAL)
+
+	if Beach.rlist:
+		for i in range(len(Beach.rlist)-1):
+			p1,q1 = Beach.rlist[i]
+			p2,q2 = Beach.rlist[i+1]
+			x,y = lineIntersect(p1,q1,p2,q2)
+			if x is not None and x > Beach.bounds["maxx"]:
+				control.plot_segment(p1.x,p1.y,q2.x,q2.y,color=config.COLOR_LINE_SPECIAL)
 
 	for e in edges:
 		Vor.insere(e[0],e[1])

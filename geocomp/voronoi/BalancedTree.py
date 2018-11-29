@@ -16,6 +16,7 @@ class TNode:
 		self.event = None # Evento circulo relacionado ao arco
 		self.startp = None # Ponto inicial da linha a ser desenhada
 		self.still = True
+		self.pair = None # Para as arestas de Delaunay na borda
 
 	def __str__(self):
 		if isinstance(self.value, list):
@@ -27,6 +28,9 @@ class BeachLine:
 	def __init__(self):
 		self.root = None
 		self.bounds = None
+		self.llist = []
+		self.rlist = []
+		self.dlist = []
 
 	# Encontra o 'próximo' node
 	def next_leaf(self,node):
@@ -155,6 +159,7 @@ class BeachLine:
 				pt.center = ptc
 				rleaf.startp = stp
 				rleaf.event = pt
+				rleaf.pair = (p,q)
 				circleevents.append(rleaf)
 
 			# Encontra o node 'anterior', para termos as triplas que determinam eventos-circulo
@@ -188,6 +193,7 @@ class BeachLine:
 				pt.center = ptc
 				node.startp = stp
 				node.event = pt
+				node.pair = (p,q)
 				circleevents.append(node)
 
 			####
@@ -545,6 +551,7 @@ class BeachLine:
 				pt.center = ptc
 				q_leaf.startp = stp
 				q_leaf.event = pt
+				q_leaf.pair = (p,q)
 				circleevents.append(q_leaf)
 
 		if ant is not None:
@@ -580,6 +587,7 @@ class BeachLine:
 				pt.center = ptc
 				p_leaf.startp = stp
 				p_leaf.event = pt
+				p_leaf.pair = (p,q)
 				circleevents.append(p_leaf)
 
 		if stp.y <= self.bounds["miny"]:
