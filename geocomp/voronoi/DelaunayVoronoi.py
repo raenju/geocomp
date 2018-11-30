@@ -73,7 +73,7 @@ def lineIntersect(p1,q1,p2,q2):
 	xfactor = (p1.x - q1.x)/(q1.y - p1.y) - (p2.x - q2.x)/( q2.y - p2.y)
 	if xfactor == 0:
 		return None,None
-	constant = (q2.y*q2.y - p2.x*p2.x - p2.y*p2.y +  q2.x*q2.x)/(2*(q2.y - p2.y)) - (q1.y*q1.y - p1.x*p1.x - p1.y*p1.y + q1.x*q1.y)/(2*(q1.y - p1.y))
+	constant = (q2.y*q2.y - p2.x*p2.x - p2.y*p2.y +  q2.x*q2.x)/(2*(q2.y - p2.y)) - (q1.y*q1.y - p1.x*p1.x - p1.y*p1.y + q1.x*q1.x)/(2*(q1.y - p1.y))
 
 	x = constant/xfactor
 	y  =  (2*(p1.x - q1.x)*x + q1.y*q1.y - p1.x*p1.x - p1.y*p1.y +  q1.x*q1.y)/(2*(q1.y - p1.y))
@@ -157,7 +157,14 @@ def fortune(l):
 			p2,q2 = Beach.llist[i+1]
 			x,y = lineIntersect(p1,q1,p2,q2)
 			if x is not None and x < Beach.bounds["minx"]:
-				control.plot_segment(p1.x,p1.y,q2.x,q2.y,color=config.COLOR_LINE_SPECIAL)
+				if q1 == p2:
+					control.plot_segment(p1.x,p1.y,q2.x,q2.y,color=config.COLOR_LINE_SPECIAL)
+				elif q1 == p1:
+					control.plot_segment(p2.x,p2.y,q2.x,q2.y,color=config.COLOR_LINE_SPECIAL)
+				elif q2 == p2:
+					control.plot_segment(p1.x,p1.y,q1.x,q1.y,color=config.COLOR_LINE_SPECIAL)
+				else:
+					control.plot_segment(p2.x,p2.y,q1.x,q1.y,color=config.COLOR_LINE_SPECIAL)
 
 	if Beach.rlist:
 		for i in range(len(Beach.rlist)-1):
@@ -165,7 +172,14 @@ def fortune(l):
 			p2,q2 = Beach.rlist[i+1]
 			x,y = lineIntersect(p1,q1,p2,q2)
 			if x is not None and x > Beach.bounds["maxx"]:
-				control.plot_segment(p1.x,p1.y,q2.x,q2.y,color=config.COLOR_LINE_SPECIAL)
+				if q1 == p2:
+					control.plot_segment(p1.x,p1.y,q2.x,q2.y,color=config.COLOR_LINE_SPECIAL)
+				elif q1 == p1:
+					control.plot_segment(p2.x,p2.y,q2.x,q2.y,color=config.COLOR_LINE_SPECIAL)
+				elif q2 == p2:
+					control.plot_segment(p1.x,p1.y,q1.x,q1.y,color=config.COLOR_LINE_SPECIAL)
+				else:
+					control.plot_segment(p2.x,p2.y,q1.x,q1.y,color=config.COLOR_LINE_SPECIAL)
 
 	for e in edges:
 		Vor.insere(e[0],e[1])
