@@ -181,3 +181,5 @@ def fortune(l):
 
 	for e in edges:
 		Vor.insere(e[0],e[1])
+
+	return Vor

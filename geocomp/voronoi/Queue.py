@@ -47,7 +47,6 @@ class EventQueue:
 			return False
 		else:
 			self.takeRec(key, self.root)
-			control.plot_disc (key.x, key.y, config.COLOR_PRIM, 6)
 
 
 
