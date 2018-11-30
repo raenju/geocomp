@@ -120,6 +120,8 @@ def fortune(l):
 		for i in range(y_count):
 			aligned.append(Q.takeHighest())
 		aligned = list(reversed(aligned))
+		for i in range(len(aligned)-1):
+			control.plot_segment(aligned[i].x,aligned[i].y,aligned[i+1].x,aligned[i+1].y,color=config.COLOR_LINE_SPECIAL)
 		Beach.create_particular(aligned)
 
 	while Q.root is not None:
