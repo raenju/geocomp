@@ -50,7 +50,6 @@ def trataCirculo(atual,Q,beach):
 			if c.y <= atual.y:
 				Q.put(c,c)
 				control.plot_disc (c.x, c.y, config.COLOR_ALT3, 5)
-	c = atual.center
 
 def trataInf(atual,Q,beach):
 	leaf = atual.leaf
@@ -90,6 +89,8 @@ def fortune(l):
 	max_x = min_x = l[0].x
 	max_y = min_y = l[0].y
 	first_y = None
+	high_y = None
+	y_count = 1
 	for p in l:
 		if p.x > max_x:
 			max_x = p.x
@@ -99,6 +100,13 @@ def fortune(l):
 			max_y = p.y
 		if p.y < min_y:
 			min_y = p.y
+		if high_y is None:
+			high_y = p.y
+		elif p.y > high_y:
+			high_y = p.y
+			y_count = 1
+		elif p.y == high_y:
+			y_count = y_count + 1
 		Q.put(Ponto(p.x, p.y), Ponto(p.x,p.y))
 	yd = max_y - min_y
 	xd = max_x - min_x
@@ -106,10 +114,16 @@ def fortune(l):
 	mfactor = 0.7
 	bounds = {"maxx":(max_x + min_x)/2 + dd*mfactor, "minx":(max_x + min_x)/2 - dd*mfactor, "maxy":(max_y + min_y)/2 + dd*mfactor,"miny":(max_y + min_y)/2 - dd*mfactor}
 	Beach.bounds = bounds
+
+	if y_count > 1:
+		aligned = []
+		for i in range(y_count):
+			aligned.append(Q.takeHighest())
+		aligned = list(reversed(aligned))
+		Beach.create_particular(aligned)
+
 	while Q.root is not None:
 		atual = Q.takeHighest()
-		if first_y is None:
-			first_y = atual.y
 		# Desenha a linha de varredura e as parabolas
 		control.freeze_update()
 		if lineid is not None: control.plot_delete(lineid)

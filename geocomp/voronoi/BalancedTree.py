@@ -232,6 +232,28 @@ class BeachLine:
 				return self.insertRec(value, node.left, c)
 			else:
 				return self.insertRec(value, node.right, c)
+
+	def create_particular(self, vec):
+		self.root, dummy = self.create_particular_rec(vec)
+
+	def create_particular_rec(self, vec):
+		n = len(vec)
+		if n == 1:
+			return TNode(vec[0]),1
+		mid = int((n-1)/2)
+		newnode = TNode([vec[mid],vec[mid+1]])
+		newnode.startp = Ponto((vec[mid].x+vec[mid+1].x)/2,self.bounds["maxy"])
+		lvec = vec[:mid+1]
+		rvec = vec[mid+1:]
+		lroot, lh = self.create_particular_rec(lvec)
+		rroot, rh = self.create_particular_rec(rvec)
+		newnode.balance = rh-lh
+		newnode.left = lroot
+		newnode.right = rroot
+		lroot.parent = newnode
+		rroot.parent = newnode
+		hret = max(lh,rh)+1
+		return newnode, hret
 				
 	def search(self, value, c):
 		if self.root is None:
