@@ -70,21 +70,6 @@ class BeachLine:
 
 	def insertRec(self, value, node, c):
 		if node.right is None and node.left is None: # é uma folha
-			# if node.value.y == value.y:
-			# 	newnode = TNode([node.value, value])
-			# 	newnode.parent = node.parent
-			# 	newnode.balance = 0
-			# 	node.parent = newnode
-
-			# 	newnode3 = TNode(value)
-			# 	newnode3.parent = newnode
-			# 	if node.value.x < value.x:
-			# 		newnode.left = node
-			# 		newnode.right = newnode3
-			# 	else:
-			# 		newnode.left = newnode3
-			# 		newnode.right = node
-			# 	return [[], None, []]
 
 			# Armazena o evento circulo do arco
 			removeEvent = node.event
@@ -121,8 +106,6 @@ class BeachLine:
 			newnode2.startp = stp
 			#
 
-			#control.plot_disc (stp.x, stp.y, config.COLOR_ALT1, 5)
-
 			# Atualiza o apontador da raiz, caso seja necessário
 			if self.root == node:
 				self.root = node.parent
@@ -133,7 +116,30 @@ class BeachLine:
 			if cnode is not None:
 				lp = self.circleLowerPoint(cnode.value, node.value, value)
 				if lp is None: # Os pontos não formam um circulo
-					rleaf.event = None
+					if p.x > q.x:
+						pl,ql = q,p
+					else:
+						pl,ql = p,q
+					if pl.y > ql.y:
+						x0 = self.bounds["minx"]
+					else:
+						x0 = self.bounds["maxx"]
+					if p.y == q.y:
+						ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+					else:
+						yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
+						ptc = Ponto(x0,yv)
+					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+					if pt.y > value.y:
+						pt.y = value.y
+					pt.leaf = rleaf
+					pt.isInf = True
+					pt.center = ptc
+					rleaf.startp = stp
+					rleaf.pair = (p,q)
+					rleaf.event = pt
+					circleevents.append(rleaf)
 				else:
 					lp.leaf = rleaf
 					rleaf.event = lp 
@@ -167,7 +173,30 @@ class BeachLine:
 			if cnode is not None:
 				lp = self.circleLowerPoint(cnode.value, node.value, value)
 				if lp is None: # Os pontos não formam um circulo
-					node.event = None
+					if p.x > q.x:
+						pl,ql = q,p
+					else:
+						pl,ql = p,q
+					if pl.y > ql.y:
+						x0 = self.bounds["minx"]
+					else:
+						x0 = self.bounds["maxx"]
+					if p.y == q.y:
+						ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+					else:
+						yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
+						ptc = Ponto(x0,yv)
+					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+					if pt.y > value.y:
+						pt.y = value.y
+					pt.leaf = node
+					pt.isInf = True
+					pt.center = ptc
+					node.startp = stp
+					node.pair = (p,q)
+					node.event = pt
+					circleevents.append(node)
 				else:
 					lp.leaf = node
 					node.event = lp
@@ -358,11 +387,8 @@ class BeachLine:
 			ant = cnode.value
 			antn = cnode
 
-		if ant == prox:
-			print('collapse')
-			if ant is None and prox is None:
-				print("----a")
-				return []
+		if ant is None and prox is None:
+			return []
 
 		pred = None
 		suc = None
@@ -375,10 +401,6 @@ class BeachLine:
 		if ant is not None and prox is not None:
 			novo = TNode([antn,proxn])
 
-		if cnode == self.root:
-			print("what?")
-		if leaf == self.root:
-			print("what??")
 		cnode = leaf.parent
 		nroot = None
 		if cnode.left == leaf:
@@ -415,11 +437,6 @@ class BeachLine:
 		if cnode is not None:
 			ant = cnode.value
 			antn = cnode
-
-		if ant == prox:
-			print('collapse')
-			if ant is None and prox is None:
-				print("----a")
 
 		# Os nós internos a serem removidos são (leaf.value, prox) e (ant, leaf.value)
 
@@ -544,7 +561,28 @@ class BeachLine:
 			q_leaf = self.prev_leaf(nxt)
 			lp = self.circleLowerPoint(nxt.value, p, q)
 			if lp is None:
-				q_leaf.event = None
+				if p.x > q.x:
+					pl,ql = q,p
+				else:
+					pl,ql = p,q
+				if pl.y > ql.y:
+					x0 = self.bounds["minx"]
+				else:
+					x0 = self.bounds["maxx"]
+				if p.y == q.y:
+					ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+				else:
+					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
+					ptc = Ponto(x0,yv)
+				dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+				pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+				pt.leaf = q_leaf
+				pt.isInf = True
+				pt.center = ptc
+				q_leaf.startp = stp
+				q_leaf.pair = (p,q)
+				q_leaf.event = pt
+				circleevents.append(q_leaf)
 			else:
 				if q_leaf.event is not None:
 					removeevents.append(q_leaf.event)
@@ -580,7 +618,28 @@ class BeachLine:
 			p_leaf = self.next_leaf(ant)
 			lp = self.circleLowerPoint(ant.value, p, q)
 			if lp is None:
-				p_leaf.event = None
+				if p.x > q.x:
+					pl,ql = q,p
+				else:
+					pl,ql = p,q
+				if pl.y > ql.y:
+					x0 = self.bounds["minx"]
+				else:
+					x0 = self.bounds["maxx"]
+				if p.y == q.y:
+					ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+				else:
+					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
+					ptc = Ponto(x0,yv)
+				dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+				pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+				pt.leaf = p_leaf
+				pt.isInf = True
+				pt.center = ptc
+				p_leaf.startp = stp
+				p_leaf.pair = (p,q)
+				p_leaf.event = pt
+				circleevents.append(p_leaf)
 			else:
 				if p_leaf.event is not None:
 					removeevents.append(p_leaf.event)
