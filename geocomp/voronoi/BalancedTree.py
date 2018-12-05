@@ -126,11 +126,13 @@ class BeachLine:
 						x0 = self.bounds["maxx"]
 					if p.y == q.y:
 						ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+						dt = self.bounds["maxy"]-self.bounds["miny"]
+						pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 					else:
 						yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 						ptc = Ponto(x0,yv)
-					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+						dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+						pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
 					if pt.y > value.y:
 						pt.y = value.y
 					pt.leaf = rleaf
@@ -153,11 +155,13 @@ class BeachLine:
 				ptc = None
 				if(p.y == q.y):
 					ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+					dt = self.bounds["maxy"]-self.bounds["miny"]
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 				else:
 					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 					ptc = Ponto(x0,yv)
-				dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-				pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
 				if pt.y > value.y:
 					pt.y = value.y
 				pt.leaf = rleaf
@@ -183,11 +187,13 @@ class BeachLine:
 						x0 = self.bounds["maxx"]
 					if p.y == q.y:
 						ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+						dt = self.bounds["maxy"]-self.bounds["miny"]
+						pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 					else:
 						yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 						ptc = Ponto(x0,yv)
-					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+						dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+						pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
 					if pt.y > value.y:
 						pt.y = value.y
 					pt.leaf = node
@@ -210,11 +216,13 @@ class BeachLine:
 				ptc = None
 				if(p.y == q.y):
 					ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+					dt = self.bounds["maxy"]-self.bounds["miny"]
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 				else:
 					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 					ptc = Ponto(x0,yv)
-				dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-				pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
 				if pt.y > value.y:
 					pt.y = value.y
 				pt.leaf = node
@@ -261,6 +269,52 @@ class BeachLine:
 				return self.insertRec(value, node.left, c)
 			else:
 				return self.insertRec(value, node.right, c)
+
+	def rotate_left(self,node):
+		if node.right is None: # Não é possível rodar para a esquerda
+			print("Operação inválida (rotate_left)")
+			return
+
+		rchild = node.right
+		lsub = rchild.left
+		nparent = node.parent
+
+		node.parent = rchild
+		rchild.left = node
+		node.right = lsub
+		if lsub is not None:
+			lsub.parent = node
+		rchild.parent = nparent
+		if nparent is None:
+			self.root = rchild
+		else:
+			if nparent.left == node:
+				nparent.left = rchild
+			else:
+				nparent.right = rchild
+
+	def rotate_right(self,node):
+		if node.left is None: # Não é possível rodar para a direita
+			print("Operação inválida (rotate_right)")
+			return
+
+		lchild = node.left
+		rsub = lchild.right
+		nparent = node.parent
+
+		node.parent = lchild
+		lchild.right = node
+		node.left = rsub
+		if rsub is not None:
+			rsub.parent = node
+		lchild.parent = nparent
+		if nparent is None:
+			self.root = lchild
+		else:
+			if nparent.left == node:
+				nparent.left = lchild
+			else:
+				nparent.right = lchild
 
 	def create_particular(self, vec):
 		self.root, dummy = self.create_particular_rec(vec)
@@ -571,11 +625,13 @@ class BeachLine:
 					x0 = self.bounds["maxx"]
 				if p.y == q.y:
 					ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+					dt = self.bounds["maxy"]-self.bounds["miny"]
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 				else:
 					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 					ptc = Ponto(x0,yv)
-				dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-				pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
 				pt.leaf = q_leaf
 				pt.isInf = True
 				pt.center = ptc
@@ -598,11 +654,13 @@ class BeachLine:
 			pt = None
 			if p.y == q.y:
 				ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+				dt = self.bounds["maxy"]-self.bounds["miny"]
+				pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 			else:
 				y0 = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 				ptc = Ponto(x0,y0)
-			dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-			pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+				dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+				pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
 			if pt.y <= liney:
 				if q_leaf.event is not None:
 					removeevents.append(q_leaf.event)
@@ -628,11 +686,13 @@ class BeachLine:
 					x0 = self.bounds["maxx"]
 				if p.y == q.y:
 					ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+					dt = self.bounds["maxy"]-self.bounds["miny"]
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 				else:
 					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 					ptc = Ponto(x0,yv)
-				dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-				pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
 				pt.leaf = p_leaf
 				pt.isInf = True
 				pt.center = ptc
@@ -655,11 +715,13 @@ class BeachLine:
 			pt = None
 			if p.y == q.y:
 				ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+				dt = self.bounds["maxy"]-self.bounds["miny"]
+				pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 			else:
 				y0 = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 				ptc = Ponto(x0,y0)
-			dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-			pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+				dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+				pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
 			if pt.y <= liney:
 				if p_leaf.event is not None:
 					removeevents.append(p_leaf.event)
