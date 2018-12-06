@@ -235,25 +235,30 @@ class BeachLine:
 
 			####
 			#Propagar as mudanças de balance
-			node = newnode
-			c_height = 2
-			while node.parent is not None:
-				if node.parent.left == node:
-					node.parent.balance = node.parent.balance - c_height
-					if node.parent.balance >= 0:
-						c_height = 0
-					else: 
-						if node.parent.balance + c_height >= 0:
-							c_height = -node.parent.balance
-				else:
-					node.parent.balance = node.parent.balance + c_height
-					if node.parent.balance <= 0:
-						c_height = 0
-					else:
-						if node.parent.balance - c_height  <= 0:
-							c_height = node.parent.balance
-				node = node.parent
+			# node = newnode
+			# c_height = 2
+			# while node.parent is not None:
+			# 	if node.parent.left == node:
+			# 		node.parent.balance = node.parent.balance - c_height
+			# 		if node.parent.balance >= 0:
+			# 			c_height = 0
+			# 		else: 
+			# 			if node.parent.balance + c_height >= 0:
+			# 				c_height = -node.parent.balance
+			# 	else:
+			# 		node.parent.balance = node.parent.balance + c_height
+			# 		if node.parent.balance <= 0:
+			# 			c_height = 0
+			# 		else:
+			# 			if node.parent.balance - c_height  <= 0:
+			# 				c_height = node.parent.balance
+			# 	node = node.parent
 			#Balancear!!
+			if newnode.parent is not None:
+				if newnode.parent.left == newnode:
+					self.balanceNode(newnode.parent,2,0)
+				else:
+					self.balanceNode(newnode.parent,0,2)
 			####
 
 			arc = [newnode, lleaf, newnode2]
@@ -269,6 +274,52 @@ class BeachLine:
 				return self.insertRec(value, node.left, c)
 			else:
 				return self.insertRec(value, node.right, c)
+
+	# Balanceamento da árvore. leftinc e rightinc são a variação de altura das subarvores esquerda e direita
+	# Não é possivel que leftinc e rightinc sejam diferentes de zero ao mesmo tempo
+	def balanceNode(self,node,leftinc,rightinc):
+		if leftinc == 0 and rightinc == 0:
+			return
+		if leftinc != 0:
+			if node.balance - leftinc > 1 or node.balance - leftinc < -1:
+				pass
+			else:
+				nb = node.balance
+				node.balance = nb - leftinc
+				if nb >= 0 and node.balance >= 0:
+					return
+				if nb >= 0 and node.balance < 0:
+					if node.parent is not None:
+						if node.parent.left == node:
+							self.balanceNode(node.parent,-node.balance,0)
+						else:
+							self.balanceNode(node.parent,0,-node.balance)
+				else:
+					if node.parent is not None:
+						if node.parent.left == node:
+							self.balanceNode(node.parent,leftinc,0)
+						else:
+							self.balanceNode(node.parent,0,leftinc)
+		if rightinc != 0:
+			if node.balance + rightinc > 1 or node.balance + rightinc < -1:
+				pass
+			else:
+				nb = node.balance
+				node.balance = nb + rightinc
+				if nb <= 0 and node.balance <= 0:
+					return
+				if nb <= 0 and node.balance > 0:
+					if node.parent is not None:
+						if node.parent.left == node:
+							self.balanceNode(node.parent,node.balance,0)
+						else:
+							self.balanceNode(node.parent,0,node.balance)
+				else:
+					if node.parent is not None:
+						if node.parent.left == node:
+							self.balanceNode(node.parent,rightinc,0)
+						else:
+							self.balanceNode(node.parent,0,rightinc)
 
 	def rotate_left(self,node):
 		if node.right is None: # Não é possível rodar para a esquerda
