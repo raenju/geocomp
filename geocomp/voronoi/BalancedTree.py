@@ -235,30 +235,31 @@ class BeachLine:
 
 			####
 			#Propagar as mudanças de balance
-			# node = newnode
-			# c_height = 2
-			# while node.parent is not None:
-			# 	if node.parent.left == node:
-			# 		node.parent.balance = node.parent.balance - c_height
-			# 		if node.parent.balance >= 0:
-			# 			c_height = 0
-			# 		else: 
-			# 			if node.parent.balance + c_height >= 0:
-			# 				c_height = -node.parent.balance
-			# 	else:
-			# 		node.parent.balance = node.parent.balance + c_height
-			# 		if node.parent.balance <= 0:
-			# 			c_height = 0
-			# 		else:
-			# 			if node.parent.balance - c_height  <= 0:
-			# 				c_height = node.parent.balance
-			# 	node = node.parent
-			#Balancear!!
-			if newnode.parent is not None:
-				if newnode.parent.left == newnode:
-					self.balanceNode(newnode.parent,2,0)
+			node = newnode
+			c_height = 2
+			while node.parent is not None:
+				if node.parent.left == node:
+					node.parent.balance = node.parent.balance - c_height
+					if node.parent.balance >= 0:
+						c_height = 0
+					else: 
+						if node.parent.balance + c_height >= 0:
+							c_height = -node.parent.balance
 				else:
-					self.balanceNode(newnode.parent,0,2)
+					node.parent.balance = node.parent.balance + c_height
+					if node.parent.balance <= 0:
+						c_height = 0
+					else:
+						if node.parent.balance - c_height  <= 0:
+							c_height = node.parent.balance
+				node = node.parent
+
+			# Balanceamento
+			bnode = newnode.parent
+			while bnode is not None:
+				if bnode.balance > 1 or bnode.balance < -1:
+					self.rebalance(bnode)
+				bnode = bnode.parent
 			####
 
 			arc = [newnode, lleaf, newnode2]
@@ -275,51 +276,50 @@ class BeachLine:
 			else:
 				return self.insertRec(value, node.right, c)
 
-	# Balanceamento da árvore. leftinc e rightinc são a variação de altura das subarvores esquerda e direita
-	# Não é possivel que leftinc e rightinc sejam diferentes de zero ao mesmo tempo
-	def balanceNode(self,node,leftinc,rightinc):
-		if leftinc == 0 and rightinc == 0:
-			return
-		if leftinc != 0:
-			if node.balance - leftinc > 1 or node.balance - leftinc < -1:
-				pass
-			else:
-				nb = node.balance
-				node.balance = nb - leftinc
-				if nb >= 0 and node.balance >= 0:
-					return
-				if nb >= 0 and node.balance < 0:
-					if node.parent is not None:
-						if node.parent.left == node:
-							self.balanceNode(node.parent,-node.balance,0)
-						else:
-							self.balanceNode(node.parent,0,-node.balance)
+	def rebalance(self, node):
+		if node.balance > 1:
+			if node.right.balance >= 0:
+				if node.right.balance == 0:
+					node.right.balance = node.right.balance - 1
+					node.balance = node.balance + 1
 				else:
-					if node.parent is not None:
-						if node.parent.left == node:
-							self.balanceNode(node.parent,leftinc,0)
-						else:
-							self.balanceNode(node.parent,0,leftinc)
-		if rightinc != 0:
-			if node.balance + rightinc > 1 or node.balance + rightinc < -1:
-				pass
+					node.balance = 0
+					node.right.balance = 0
+				self.rotate_left(node)
 			else:
-				nb = node.balance
-				node.balance = nb + rightinc
-				if nb <= 0 and node.balance <= 0:
-					return
-				if nb <= 0 and node.balance > 0:
-					if node.parent is not None:
-						if node.parent.left == node:
-							self.balanceNode(node.parent,node.balance,0)
-						else:
-							self.balanceNode(node.parent,0,node.balance)
+				if node.right.left.balance > 0:
+					node.right.balance = 0
+					node.balance = 1 
+				elif node.right.left.balance == 0:
+					node.balance = 0
+					node.right.balance = 0
 				else:
-					if node.parent is not None:
-						if node.parent.left == node:
-							self.balanceNode(node.parent,rightinc,0)
-						else:
-							self.balanceNode(node.parent,0,rightinc)
+					node.balance =  1
+					node.right.balance = 0
+				node.right.left.balance = 0
+				self.rotate_right(node.right)
+				self.rotate_left(node)
+		if node.balance < -1:
+			if node.left.balance <= 0:
+				if node.left.balance == 0:
+					node.left.balance = node.left.balance + 1
+					node.balance = node.balance - 1
+				else:
+					node.balance = 0
+					node.left.balance = 0
+			else:
+				if node.left.right.balance > 0:
+					node.left.balance = 1
+					node.balance = 0
+				elif node.left.right.balance == 0:
+					node.balance = 0
+					node.left.balance = 0
+				else:
+					node.balance = -1
+					node.left.balance = 0
+				node.left.right.balance = 0
+				self.rotate_left(node.left)
+				self.rotate_right(node)
 
 	def rotate_left(self,node):
 		if node.right is None: # Não é possível rodar para a esquerda
