@@ -136,7 +136,8 @@ def fortune(l, triang):
 			drawDelaunayEdge(aligned[i].x,aligned[i].y,aligned[i+1].x,aligned[i+1].y)
 		Beach.create_particular(aligned)
 
-	while Q.root is not None:
+	#while Q.root is not None:
+	while Q.len != -1:
 		atual = Q.takeHighest()
 		# Desenha a linha de varredura e as parabolas
 		control.freeze_update()

@@ -33,8 +33,63 @@ class Node:
 class EventQueue:
 
 	def __init__(self):
+		self.arr = []
+		self.len = -1
+
+	def put(self, item, key):
+		self.len += 1
+		self.arr.append(None)
+		self.findSpot(self.len, item)
+
+	def findSpot(self, i, item):
+		self.arr[i] = item
+		half = int(i/2)
+		while i>1 and self.arr[half].y < self.arr[i].y:
+			aux = self.arr[half]
+			self.arr[half] = self.arr[i]
+			self.arr[i] = aux
+			i = half
+
+	def take(self, item):
+		for i in self.arr:
+			if i == item:
+				taken = self.arr[i]
+				self.arr[i] = self.arr[self.len]
+				self.len -= 1
+				self.heapify(i)
+				return
+
+	def takeHighest(self):
+		if self.len == -1:
+			return False
+		M = self.arr[0]
+		self.arr[0] = self.arr[self.len]
+		self.len -= 1
+		self.heapify(0)
+		return M
+
+	def heapify(self, i):
+		l = 2*i
+		r = l+1
+		Largest = 0
+		if l<=self.len and self.arr[l].y > self.arr[i].y:
+			Largest = l
+		else:
+			Largest = i
+		if r<=self.len and self.arr[r].y > Largest:
+			Largest = r
+		if Largest != i:
+			aux = self.arr[Largest]
+			self.arr[Largest] = self.arr[i]
+			self.arr[i] = aux
+			self.heapify(Largest)
+
+
+	"""
+	def __init__(self):
 		self.root = None
 		self.size = 0
+		self.d = {}
 
 	def put(self, item, key):
 		if self.root is None:
@@ -45,6 +100,15 @@ class EventQueue:
 	def take(self, key):
 		if self.root is None:
 			return False
+		if self.root.key == key:
+			if self.root.hasRight() and self.root.hasLeft():
+				r = self.root.right
+				self.putRec(r.item, r.key, self.root.left)
+				self.root = self.root.left
+			elif self.root.hasLeft():
+				self.root = self.root.left
+			else:
+				self.root = self.root.right
 		else:
 			self.takeRec(key, self.root)
 
@@ -148,7 +212,8 @@ class EventQueue:
 					parent.left = taken.right
 				if parent.right == taken:
 					parent.right = taken.right
-			
+
+
 	def takeHighest(self):
 		if self.root.hasRight():
 			prox = None
@@ -175,3 +240,4 @@ class EventQueue:
 		self.tpr(node.left)
 		print(node.item.x,node.item.y)
 		self.tpr(node.right)
+		"""
