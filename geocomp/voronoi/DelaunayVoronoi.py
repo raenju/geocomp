@@ -28,7 +28,6 @@ def trataPonto(atual,Q,beach):
 	if arcs:
 		p,q = arcs[0].value
 		drawDelaunayEdge(p.x,p.y,q.x,q.y)
-		#control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_ALT3)
  
 def trataCirculo(atual,Q,beach):
 	pred,suc,novo = beach.remove(atual.leaf)
@@ -42,7 +41,6 @@ def trataCirculo(atual,Q,beach):
 	if novo is not None:
 		p,q = novo.value
 		drawDelaunayEdge(p.x,p.y,q.x,q.y)
-		#control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_ALT3)
 		evc,rem = beach.atualiza_eventos(novo,atual.y,pred,suc)
 		for ev in rem:
 			Q.take(ev)
@@ -136,7 +134,6 @@ def fortune(l, triang):
 		aligned = list(reversed(aligned))
 		for i in range(len(aligned)-1):
 			drawDelaunayEdge(aligned[i].x,aligned[i].y,aligned[i+1].x,aligned[i+1].y)
-			#control.plot_segment(aligned[i].x,aligned[i].y,aligned[i+1].x,aligned[i+1].y,color=config.COLOR_ALT3)
 		Beach.create_particular(aligned)
 
 	while Q.root is not None:
@@ -174,16 +171,12 @@ def fortune(l, triang):
 			if x is not None and x < Beach.bounds["minx"]:
 				if q1 == p2:
 					drawDelaunayEdge(p1.x,p1.y,q2.x,q2.y)
-					#control.plot_segment(p1.x,p1.y,q2.x,q2.y,color=config.COLOR_ALT3)
 				elif q1 == p1:
 					drawDelaunayEdge(p2.x,p2.y,q2.x,q2.y)
-					#control.plot_segment(p2.x,p2.y,q2.x,q2.y,color=config.COLOR_ALT3)
 				elif q2 == p2:
 					drawDelaunayEdge(p1.x,p1.y,q1.x,q1.y)
-					#control.plot_segment(p1.x,p1.y,q1.x,q1.y,color=config.COLOR_ALT3)
 				else:
 					drawDelaunayEdge(p2.x,p2.y,q1.x,q1.y)
-					#control.plot_segment(p2.x,p2.y,q1.x,q1.y,color=config.COLOR_ALT3)
 
 	if Beach.rlist:
 		for i in range(len(Beach.rlist)-1):
@@ -193,16 +186,12 @@ def fortune(l, triang):
 			if x is not None and x > Beach.bounds["maxx"]:
 				if q1 == p2:
 					drawDelaunayEdge(p1.x,p1.y,q2.x,q2.y)
-					#control.plot_segment(p1.x,p1.y,q2.x,q2.y,color=config.COLOR_ALT3)
 				elif q1 == p1:
 					drawDelaunayEdge(p2.x,p2.y,q2.x,q2.y)
-					#control.plot_segment(p2.x,p2.y,q2.x,q2.y,color=config.COLOR_ALT3)
 				elif q2 == p2:
 					drawDelaunayEdge(p1.x,p1.y,q1.x,q1.y)
-					#control.plot_segment(p1.x,p1.y,q1.x,q1.y,color=config.COLOR_ALT3)
 				else:
 					drawDelaunayEdge(p2.x,p2.y,q1.x,q1.y)
-					#control.plot_segment(p2.x,p2.y,q1.x,q1.y,color=config.COLOR_ALT3)
 
 	Vor.constroi(edges)
 
