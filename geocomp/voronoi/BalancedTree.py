@@ -3,9 +3,12 @@ import copy
 from .Queue import Ponto
 from geocomp.common.guiprim import *
 from geocomp.common import control
+
+# Area do triângulo formado por 3 pontos com sinal.
 def area(a,b,c):
 	return ((a.x-c.x)*(b.y-c.y)-(a.y-c.y)*(b.x-c.x))/2
 
+# Nó da árvore
 class TNode:
 	def __init__(self, value):
 		self.left = None
@@ -24,6 +27,7 @@ class TNode:
 		else:
 			return str(self.value.x) + " " + str(self.value.y)
 
+# Linha da praia
 class BeachLine:
 	def __init__(self):
 		self.root = None
@@ -276,6 +280,7 @@ class BeachLine:
 			else:
 				return self.insertRec(value, node.right, c)
 
+	# Rebalanceia um nó por meio de rotações. Leva em conta o balance do nó para o rebalanceamento
 	def rebalance(self, node):
 		if node.balance > 1:
 			if node.right.balance >= 0:
@@ -321,6 +326,7 @@ class BeachLine:
 				self.rotate_left(node.left)
 				self.rotate_right(node)
 
+	# Rotação para a esquerda
 	def rotate_left(self,node):
 		if node.right is None: # Não é possível rodar para a esquerda
 			print("Operação inválida (rotate_left)")
@@ -344,6 +350,7 @@ class BeachLine:
 			else:
 				nparent.right = rchild
 
+	# Rotação para a direita
 	def rotate_right(self,node):
 		if node.left is None: # Não é possível rodar para a direita
 			print("Operação inválida (rotate_right)")
@@ -367,6 +374,7 @@ class BeachLine:
 			else:
 				nparent.right = lchild
 
+	# Cria a árvore inicial no caso de mais de um ponto estar na mesma horizontal, e serem os primeiros pontos encontrados
 	def create_particular(self, vec):
 		self.root, dummy = self.create_particular_rec(vec)
 
@@ -388,7 +396,9 @@ class BeachLine:
 		rroot.parent = newnode
 		hret = max(lh,rh)+1
 		return newnode, hret
-				
+			
+
+	# Funções de busca - Não usadas no projeto	
 	def search(self, value, c):
 		if self.root is None:
 			return None
@@ -418,6 +428,7 @@ class BeachLine:
 			else:
 				return self.searchRec(value, node.right, c)
 
+	# Encontra a x-coordenada na intersecção de duas parabolas
 	def parabolaIntersectX(self, p, q, c): # p e q são os pontos que definem as duas parabolas, c é a y-coord da linha de varredura
 
 		# Casos degenerados
@@ -449,6 +460,7 @@ class BeachLine:
 			return x2
 		return x1
 
+	# Determina o círculo que contém 3 pontos, seu ponto mais baixo e seu centro
 	def circleLowerPoint(self, p, q, r):
 		if area(p,q,r) == 0:
 			return None
@@ -471,6 +483,7 @@ class BeachLine:
 		rad = math.sqrt((cx-p.x)*(cx-p.x)+(cy-p.y)*(cy-p.y))
 		return Ponto(cx,cy-rad,isPonto=False,center=Ponto(cx,cy))   # <<< A y-coord da linha de varredura diminui ao longo do alg
 
+	# Caso particular - Remove um nó da árvore, quando o nó é o mais à direita ou à esquerda da árvore
 	def removeInf(self,leaf):
 		if leaf == self.root:
 			self.root = None
@@ -525,6 +538,7 @@ class BeachLine:
 			else:
 				cnode.parent.right = nroot
 
+	# Remove um nó da árvore
 	def remove(self, leaf):
 		prox = None
 		proxn = None
@@ -612,6 +626,7 @@ class BeachLine:
 				low.parent.left = nroot
 			else:
 				low.parent.right = nroot
+
 		else: # Certamente não devia acontecer. Um evento circulo precisa ter uma proxima regiao, e uma regiao anterior
 			print("Devia contecer?")
 			cnode = leaf.parent
@@ -637,6 +652,7 @@ class BeachLine:
 		# Precisa adicionar os eventos circulo da divisão nova (novo[0], novo[1], prox(novo[1])) (ant(novo[0]),novo[0],novo[1])
 		return [pred,suc,high]
 
+	# Determina os novos eventos-círculo após o processamento de um evento-círculo
 	def atualiza_eventos(self,novo,liney,apred,asuc):
 		circleevents = []
 		removeevents = []
@@ -788,6 +804,7 @@ class BeachLine:
 			circleevents = []
 		return circleevents,removeevents
 
+	# Remove folhas que não influenciam na região visível do diagrama. Não usado no projeto - NAO TESTADO
 	def trim(self, c):
 		if self.root is None:
 			return
@@ -808,6 +825,7 @@ class BeachLine:
 			if x > self.bounds["maxx"]:
 				self.removeInf(node)
 
+	# Desenha as parábolas da linha da praia
 	def draw_parabolas(self, c):
 		if self.root is None:
 			return []
@@ -829,6 +847,7 @@ class BeachLine:
 		id_list.append(line_id)
 		return id_list
 
+	# Função de teste: Imprime a árvore
 	def test_r2lprint(self):
 		r = self.root
 		if r is not None:

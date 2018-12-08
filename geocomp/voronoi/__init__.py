@@ -21,7 +21,8 @@ from . import DelaunayVoronoi
 # cada entrada deve ter:
 #  [ 'nome-do-modulo', 'nome-da-funcao', 'nome do algoritmo' ]
 children = [ 
-	[ 'DelaunayVoronoi', 'fortune', 'Fortune+Delaunay' ]
+	[ 'DelaunayVoronoi', 'fortEnv', 'Fortune+Delaunay' ],
+	[ 'DelaunayVoronoi', 'vorEnv', 'Fortune']
 ]
 
 #children = algorithms

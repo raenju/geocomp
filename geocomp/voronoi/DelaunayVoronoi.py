@@ -11,7 +11,7 @@ min_x = None
 max_y = None
 min_y = None
 edges = []
-
+DelaunayTriangDraw = None
 
 def trataPonto(atual,Q,beach):
 	ins = beach.insert(atual,atual.y)
@@ -27,7 +27,8 @@ def trataPonto(atual,Q,beach):
 	# arc contém uma aresta de voronoi, logo as regioes que divide são vizinhas, e existe uma aresta de delaunay entre seus pontos
 	if arcs:
 		p,q = arcs[0].value
-		control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
+		drawDelaunayEdge(p.x,p.y,q.x,q.y)
+		#control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_ALT3)
  
 def trataCirculo(atual,Q,beach):
 	pred,suc,novo = beach.remove(atual.leaf)
@@ -40,7 +41,8 @@ def trataCirculo(atual,Q,beach):
 
 	if novo is not None:
 		p,q = novo.value
-		control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_LINE_SPECIAL)
+		drawDelaunayEdge(p.x,p.y,q.x,q.y)
+		#control.plot_segment(p.x,p.y,q.x,q.y,color=config.COLOR_ALT3)
 		evc,rem = beach.atualiza_eventos(novo,atual.y,pred,suc)
 		for ev in rem:
 			Q.take(ev)
@@ -78,10 +80,22 @@ def lineIntersect(p1,q1,p2,q2):
 
 	return x,y
 
-def fortune(l):
+def fortEnv(l):
+	fortune(l,True)
+
+def vorEnv(l):
+	fortune(l,False)
+
+def drawDelaunayEdge(a,b,c,d):
+	if DelaunayTriangDraw == True:
+		control.plot_segment(a,b,c,d,color=config.COLOR_ALT3)
+
+def fortune(l, triang):
 	Q = EventQueue()
 	Beach = BeachLine()
 	Vor = dcel()
+	global DelaunayTriangDraw
+	DelaunayTriangDraw = triang
 	lineid = None
 	parabola_list = None
 	max_x = min_x = l[0].x
@@ -106,6 +120,8 @@ def fortune(l):
 		elif p.y == high_y:
 			y_count = y_count + 1
 		Q.put(Ponto(p.x, p.y), Ponto(p.x,p.y))
+		# Desenhas os pontos um pouco maiores
+		control.plot_disc(p.x,p.y,config.COLOR_POINT,4)
 	yd = max_y - min_y
 	xd = max_x - min_x
 	dd = max(yd,xd)
@@ -119,7 +135,8 @@ def fortune(l):
 			aligned.append(Q.takeHighest())
 		aligned = list(reversed(aligned))
 		for i in range(len(aligned)-1):
-			control.plot_segment(aligned[i].x,aligned[i].y,aligned[i+1].x,aligned[i+1].y,color=config.COLOR_LINE_SPECIAL)
+			drawDelaunayEdge(aligned[i].x,aligned[i].y,aligned[i+1].x,aligned[i+1].y)
+			#control.plot_segment(aligned[i].x,aligned[i].y,aligned[i+1].x,aligned[i+1].y,color=config.COLOR_ALT3)
 		Beach.create_particular(aligned)
 
 	while Q.root is not None:
@@ -156,13 +173,17 @@ def fortune(l):
 			x,y = lineIntersect(p1,q1,p2,q2)
 			if x is not None and x < Beach.bounds["minx"]:
 				if q1 == p2:
-					control.plot_segment(p1.x,p1.y,q2.x,q2.y,color=config.COLOR_LINE_SPECIAL)
+					drawDelaunayEdge(p1.x,p1.y,q2.x,q2.y)
+					#control.plot_segment(p1.x,p1.y,q2.x,q2.y,color=config.COLOR_ALT3)
 				elif q1 == p1:
-					control.plot_segment(p2.x,p2.y,q2.x,q2.y,color=config.COLOR_LINE_SPECIAL)
+					drawDelaunayEdge(p2.x,p2.y,q2.x,q2.y)
+					#control.plot_segment(p2.x,p2.y,q2.x,q2.y,color=config.COLOR_ALT3)
 				elif q2 == p2:
-					control.plot_segment(p1.x,p1.y,q1.x,q1.y,color=config.COLOR_LINE_SPECIAL)
+					drawDelaunayEdge(p1.x,p1.y,q1.x,q1.y)
+					#control.plot_segment(p1.x,p1.y,q1.x,q1.y,color=config.COLOR_ALT3)
 				else:
-					control.plot_segment(p2.x,p2.y,q1.x,q1.y,color=config.COLOR_LINE_SPECIAL)
+					drawDelaunayEdge(p2.x,p2.y,q1.x,q1.y)
+					#control.plot_segment(p2.x,p2.y,q1.x,q1.y,color=config.COLOR_ALT3)
 
 	if Beach.rlist:
 		for i in range(len(Beach.rlist)-1):
@@ -171,13 +192,17 @@ def fortune(l):
 			x,y = lineIntersect(p1,q1,p2,q2)
 			if x is not None and x > Beach.bounds["maxx"]:
 				if q1 == p2:
-					control.plot_segment(p1.x,p1.y,q2.x,q2.y,color=config.COLOR_LINE_SPECIAL)
+					drawDelaunayEdge(p1.x,p1.y,q2.x,q2.y)
+					#control.plot_segment(p1.x,p1.y,q2.x,q2.y,color=config.COLOR_ALT3)
 				elif q1 == p1:
-					control.plot_segment(p2.x,p2.y,q2.x,q2.y,color=config.COLOR_LINE_SPECIAL)
+					drawDelaunayEdge(p2.x,p2.y,q2.x,q2.y)
+					#control.plot_segment(p2.x,p2.y,q2.x,q2.y,color=config.COLOR_ALT3)
 				elif q2 == p2:
-					control.plot_segment(p1.x,p1.y,q1.x,q1.y,color=config.COLOR_LINE_SPECIAL)
+					drawDelaunayEdge(p1.x,p1.y,q1.x,q1.y)
+					#control.plot_segment(p1.x,p1.y,q1.x,q1.y,color=config.COLOR_ALT3)
 				else:
-					control.plot_segment(p2.x,p2.y,q1.x,q1.y,color=config.COLOR_LINE_SPECIAL)
+					drawDelaunayEdge(p2.x,p2.y,q1.x,q1.y)
+					#control.plot_segment(p2.x,p2.y,q1.x,q1.y,color=config.COLOR_ALT3)
 
 	Vor.constroi(edges)
 

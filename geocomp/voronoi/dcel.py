@@ -20,6 +20,7 @@ class dcel:
 		self.arestas = []
 		self.vertices = {}
 
+	# Determina duas arestas consecutivas com o ponto entre elas - Não usado no projeto
 	def between(self,p,q):
 		lp = self.vertices[(p.x,p.y)]
 		if len(lp) == 1:
@@ -31,6 +32,7 @@ class dcel:
 				if prim.left(a.u,a.v,q) and prim.left(b.u,b.v,q):
 					return a,b
 
+	# Insere a aresta em um vértice, na posição correta em relação às outras arestas - Não usado no projeto
 	def insere(self,u,v,prox=None,ant=None):
 		a = aresta(u,v,prox=prox,ant=ant)
 		twin = aresta(v,u,twin=a,prox=ant,ant=prox)
@@ -73,6 +75,7 @@ class dcel:
 			return True
 		return False
 
+	# Ordena a lista de arestas com um MergeSort
 	def ordena(self,lista):
 		if len(lista) <= 1:
 			return lista
@@ -99,6 +102,7 @@ class dcel:
 			j = j+1
 		return l
 
+	# Controi a DCEL dada uma lista das arestas em tempo O(n log n)
 	def constroi(self,edges):
 		for e in edges:
 			u = e[0]
