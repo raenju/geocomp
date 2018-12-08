@@ -179,7 +179,6 @@ def fortune(l):
 				else:
 					control.plot_segment(p2.x,p2.y,q1.x,q1.y,color=config.COLOR_LINE_SPECIAL)
 
-	for e in edges:
-		Vor.insere(e[0],e[1])
+	Vor.constroi(edges)
 
 	return Vor
