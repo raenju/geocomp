@@ -48,7 +48,7 @@ class EventQueue:
 	def findSpot(self, i, item):
 		self.arr[i] = item
 		half = int(i/2)
-		while self.arr[half].y < self.arr[i].y:
+		while self.arr[half].y < self.arr[i].y or (self.arr[half].y == self.arr[i].y and self.arr[half].x < self.arr[i].x):
 			aux = self.arr[half]
 			self.arr[half] = self.arr[i]
 			self.arr[i] = aux
@@ -78,11 +78,11 @@ class EventQueue:
 		l = 2*i
 		r = l+1
 		Largest = 0
-		if l<=self.len and self.arr[l].y > self.arr[i].y:
+		if l<=self.len and (self.arr[l].y > self.arr[i].y or (self.arr[l].y == self.arr[i].y and self.arr[l].x > self.arr[i].x)):
 			Largest = l
 		else:
 			Largest = i
-		if r<=self.len and self.arr[r].y > self.arr[Largest].y:
+		if r<=self.len and (self.arr[r].y > self.arr[Largest].y or (self.arr[r].y == self.arr[Largest].y and self.arr[r].x > self.arr[Largest].x)):
 			Largest = r
 		if Largest != i:
 			aux = self.arr[Largest]

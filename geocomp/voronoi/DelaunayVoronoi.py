@@ -131,6 +131,7 @@ def fortune(l, triang):
 		aligned = []
 		for i in range(y_count):
 			aligned.append(Q.takeHighest())
+		aligned = list(reversed(aligned))
 		for i in range(len(aligned)-1):
 			drawDelaunayEdge(aligned[i].x,aligned[i].y,aligned[i+1].x,aligned[i+1].y)
 		Beach.create_particular(aligned)
