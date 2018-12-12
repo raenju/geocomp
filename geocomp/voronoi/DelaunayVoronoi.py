@@ -100,6 +100,7 @@ def fortune(l, triang):
 	max_y = min_y = l[0].y
 	first_y = None
 	high_y = None
+	cur_c = None
 	y_count = 1
 	for p in l:
 		if p.x > max_x:
@@ -141,6 +142,9 @@ def fortune(l, triang):
 		# Desenha a linha de varredura e as parabolas
 		control.freeze_update()
 		if lineid is not None: control.plot_delete(lineid)
+		if cur_c is not None:
+			control.plot_delete(cur_c)
+			cur_c = None
 		lineid = control.plot_horiz_line(atual.y)
 		if parabola_list is not None:
 			for i in parabola_list:
@@ -152,6 +156,7 @@ def fortune(l, triang):
 			if atual.isPonto:
 				trataPonto(atual, Q, Beach)
 			else:
+				cur_c = control.plot_disc(atual.x,atual.y,config.COLOR_ALT5,4)
 				trataCirculo(atual, Q, Beach)
 		parabola_list = Beach.draw_parabolas(atual.y)
 		control.thaw_update()
