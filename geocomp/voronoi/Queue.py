@@ -33,66 +33,6 @@ class Node:
 class EventQueue:
 
 	def __init__(self):
-		self.arr = []
-		self.len = -1
-
-	def put(self, item, key):
-		self.len += 1
-		self.arr.append(None)
-		self.findSpot(self.len, item)
-		"""print("\n" + str(key.y) + "\n")
-		for i in self.arr:
-			print(i.y)
-		print("\n" + str(self.len) + "\n")
-"""
-	def findSpot(self, i, item):
-		self.arr[i] = item
-		half = int(i/2)
-		while self.arr[half].y < self.arr[i].y or (self.arr[half].y == self.arr[i].y and self.arr[half].x < self.arr[i].x):
-			aux = self.arr[half]
-			self.arr[half] = self.arr[i]
-			self.arr[i] = aux
-			i = half
-			half = int(i/2)
-			
-
-	def take(self, item):
-		for i in range(self.len+1):
-			if self.arr[i] == item:
-				taken = self.arr[i]
-				self.arr[i] = self.arr[self.len]
-				self.len -= 1
-				self.heapify(i)
-				return
-
-	def takeHighest(self):
-		if self.len == -1:
-			return False
-		M = self.arr[0]
-		self.arr[0] = self.arr[self.len]
-		self.len -= 1
-		self.heapify(0)
-		return M
-
-	def heapify(self, i):
-		l = 2*i
-		r = l+1
-		Largest = 0
-		if l<=self.len and (self.arr[l].y > self.arr[i].y or (self.arr[l].y == self.arr[i].y and self.arr[l].x > self.arr[i].x)):
-			Largest = l
-		else:
-			Largest = i
-		if r<=self.len and (self.arr[r].y > self.arr[Largest].y or (self.arr[r].y == self.arr[Largest].y and self.arr[r].x > self.arr[Largest].x)):
-			Largest = r
-		if Largest != i:
-			aux = self.arr[Largest]
-			self.arr[Largest] = self.arr[i]
-			self.arr[i] = aux
-			self.heapify(Largest)
-
-
-	"""
-	def __init__(self):
 		self.root = None
 		self.size = 0
 		self.d = {}
@@ -106,18 +46,41 @@ class EventQueue:
 	def take(self, key):
 		if self.root is None:
 			return False
-		if self.root.key == key:
-			if self.root.hasRight() and self.root.hasLeft():
-				r = self.root.right
-				self.putRec(r.item, r.key, self.root.left)
-				self.root = self.root.left
-			elif self.root.hasLeft():
-				self.root = self.root.left
-			else:
-				self.root = self.root.right
 		else:
 			self.takeRec(key, self.root)
 
+
+	def putRec(self, item, key, current, l, r):
+		if key.y < current.key.y:
+			if current.hasLeft():
+				self.putRec(item, key, current.left)
+			else:
+				current.left = Node(item, key)
+				current.left.left = l
+				current.left.right = r
+			return
+		if key.y > current.key.y:
+			if current.hasRight():
+				self.putRec(item, key, current.right)
+			else:
+				current.right = Node(item, key)
+				current.right.left = l
+				current.right.right = r
+			return
+		if key.x < current.key.x:
+			if current.hasLeft():
+				self.putRec(item, key, current.left)
+			else:
+				current.left = Node(item, key)
+				current.left.left = l
+				current.left.right = r
+		else:
+			if current.hasRight():
+				self.putRec(item, key, current.right)
+			else:
+				current.right = Node(item, key)
+				current.right.left = l
+				current.right.right = r
 
 
 	def putRec(self, item, key, current):
@@ -246,4 +209,3 @@ class EventQueue:
 		self.tpr(node.left)
 		print(node.item.x,node.item.y)
 		self.tpr(node.right)
-		"""
