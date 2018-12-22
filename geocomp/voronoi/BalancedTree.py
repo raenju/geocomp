@@ -64,6 +64,143 @@ class BeachLine:
 			return None
 		return cnode
 
+	def insere(self,value,c):
+		if self.root is None:
+			self.root = TNode(value)
+			return [[], None, []]
+		else:
+			return self.insereRec(value, self.root, c)
+
+	def insereRec(self, value, node, c):
+		if node.right is None and node.left is None:
+			removeEvent = node.event
+			node.event = None
+			# Cria os novos nós internos e folhas da árvore
+			newnode = TNode([node.value, value])
+			newnode.parent = node.parent
+			newnode.balance = 1
+			newnode.left = node
+			node.parent = newnode
+			if newnode.parent is not None:
+				if newnode.parent.left == node:
+					newnode.parent.left = newnode
+				else:
+					newnode.parent.right = newnode
+			newnode2 = TNode([value, node.value])
+			newnode2.parent = newnode
+			newnode.right = newnode2
+			lleaf = TNode(value)
+			rleaf = TNode(node.value)
+			lleaf.parent = newnode2
+			rleaf.parent = newnode2
+			newnode2.left = lleaf
+			newnode2.right = rleaf
+			#
+
+			# Encontra o ponto da parábola diretamente acima do ponto adicionado
+			p = node.value
+			q = value
+			stpy = (q.y*q.y - (p.x-q.x)*(p.x-q.x) - p.y*p.y)/(2*(q.y-p.y))
+			stp = Ponto(q.x,stpy)
+
+			# Atualiza o apontador da raiz, caso seja necessário
+			if self.root == node:
+				self.root = node.parent
+
+			circleevents = []
+			# Encontra o 'próximo' node, para termos as triplas que determinam eventos-circulo
+			cnode = self.next_leaf(newnode2)
+			if cnode is not None:
+				lp = self.circleLowerPoint(cnode.value, node.value, value)
+				lp.leaf = rleaf
+				rleaf.event = lp 
+				circleevents.append(rleaf)
+			else:
+				p = newnode2.value[0]
+				q = newnode2.value[1]
+				x0 = self.bounds["maxx"]
+				yv = 0
+				pt = None
+				ptc = None
+				if(p.y == q.y):
+					ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+					dt = self.bounds["maxy"]-self.bounds["miny"]
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
+				else:
+					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
+					ptc = Ponto(x0,yv)
+					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+				if pt.y > value.y:
+					pt.y = value.y
+				pt.leaf = rleaf
+				pt.isInf = True
+				pt.center = ptc
+				rleaf.startp = stp
+				rleaf.event = pt
+				rleaf.pair = (p,q)
+				circleevents.append(rleaf)
+
+			# Encontra o node 'anterior', para termos as triplas que determinam eventos-circulo
+			cnode = self.prev_leaf(newnode)
+			if cnode is not None:
+				lp = self.circleLowerPoint(cnode.value, node.value, value)
+				lp.leaf = node
+				node.event = lp
+				circleevents.append(node)
+			else:
+				p = newnode.value[0]
+				q = newnode.value[1]
+				x0 = self.bounds["minx"]
+				yv = 0
+				pt = None
+				ptc = None
+				if(p.y == q.y):
+					ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+					dt = self.bounds["maxy"]-self.bounds["miny"]
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
+				else:
+					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
+					ptc = Ponto(x0,yv)
+					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+				if pt.y > value.y:
+					pt.y = value.y
+				pt.leaf = node
+				pt.isInf = True
+				pt.center = ptc
+				node.startp = stp
+				node.event = pt
+				node.pair = (p,q)
+				circleevents.append(node)
+
+			arc = [newnode, lleaf, newnode2]
+
+			return [circleevents, removeEvent, arc]
+
+
+		else:
+			p = node.value[0]
+			q = node.value[1]
+
+			x = self.parabolaIntersectX(p,q,c)
+			if value.x <= x:
+				return self.insereRec(value, node.left, c)
+			else:
+				return self.insereRec(value, node.right, c)
+
+
+
+
+
+
+
+
+
+
+
+
+
 	# Insere o ponto value (arco de parabola correspondente). Devolve uma lista com [a folha que contem o evento circulo, evento circulo a ser removido, dados para desenhar]
 	def insert(self, value, c): # c é a y-coord da linha de varredura
 		if self.root is None:
@@ -845,6 +982,26 @@ class BeachLine:
 		proxx = self.bounds["maxx"]
 		line_id = control.plot_parabola(c,cnode.value.x,cnode.value.y,antx,proxx)
 		id_list.append(line_id)
+		return id_list
+
+	def draw_partial(self,c):
+		if self.root is None:
+			return []
+		return self.draw_partial_rec(c,self.root)
+
+	def draw_partial_rec(self,c,node):
+		if node.left is None and node.right is None:
+			return
+		p = node.value[0]
+		q = node.value[1]
+		x = self.parabolaIntersectX(p,q,c)
+		id_list = []
+		if p.y != c:
+			y = (p.x*p.x - 2*p.x*x + x*x + p.y*p.y - c*c)/(2*(p.y-c))
+			line_id = control.plot_segment(x,y,node.startp.x,node.startp.y)
+			id_list = [line_id]
+		id_list.append(self.draw_partial_rec(c,node.left))
+		id_list.append(self.draw_partial_rec(c,node.right))
 		return id_list
 
 	# Função de teste: Imprime a árvore

@@ -95,6 +95,7 @@ def fortune(l, triang):
 	global DelaunayTriangDraw
 	DelaunayTriangDraw = triang
 	lineid = None
+	partiallines = None
 	parabola_list = None
 	max_x = min_x = l[0].x
 	max_y = min_y = l[0].y
@@ -136,6 +137,8 @@ def fortune(l, triang):
 		for i in range(len(aligned)-1):
 			drawDelaunayEdge(aligned[i].x,aligned[i].y,aligned[i+1].x,aligned[i+1].y)
 		Beach.create_particular(aligned)
+
+
 	while Q.root is not None:
 		atual = Q.takeHighest()
 		# Desenha a linha de varredura e as parabolas
@@ -148,6 +151,9 @@ def fortune(l, triang):
 		if parabola_list is not None:
 			for i in parabola_list:
 				control.plot_delete(i)
+		if partiallines is not None:
+			for i in partiallines:
+				control.plot_delete(i)
 
 		if atual.isInf:
 			trataInf(atual, Q, Beach)
@@ -158,6 +164,7 @@ def fortune(l, triang):
 				cur_c = control.plot_disc(atual.x,atual.y,config.COLOR_ALT5,4)
 				trataCirculo(atual, Q, Beach)
 		parabola_list = Beach.draw_parabolas(atual.y)
+		partiallines = Beach.draw_partial(atual.y)
 		control.thaw_update()
 		control.update()
 		control.sleep()
