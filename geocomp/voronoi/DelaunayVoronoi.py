@@ -24,7 +24,6 @@ def trataPonto(atual,Q,beach):
 		c = ev.event
 		if c.y <= atual.y:
 			Q.put(c,c)
-			control.plot_disc(c.x,c.y,config.COLOR_ALT5,4)
 	# arc contém uma aresta de voronoi, logo as regioes que divide são vizinhas, e existe uma aresta de delaunay entre seus pontos
 	if arcs:
 		p,q = arcs[0].value
@@ -49,7 +48,6 @@ def trataCirculo(atual,Q,beach):
 			c = ev.event
 			if c.y <= atual.y:
 				Q.put(c,c)
-				control.plot_disc(c.x,c.y,config.COLOR_ALT5,4)
 
 def trataInf(atual,Q,beach):
 	leaf = atual.leaf
