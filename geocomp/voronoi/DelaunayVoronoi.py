@@ -24,6 +24,7 @@ def trataPonto(atual,Q,beach):
 		c = ev.event
 		if c.y <= atual.y:
 			Q.put(c,c)
+			control.plot_disc(c.x,c.y,config.COLOR_ALT5,4)
 	# arc contém uma aresta de voronoi, logo as regioes que divide são vizinhas, e existe uma aresta de delaunay entre seus pontos
 	if arcs:
 		p,q = arcs[0].value
@@ -48,6 +49,7 @@ def trataCirculo(atual,Q,beach):
 			c = ev.event
 			if c.y <= atual.y:
 				Q.put(c,c)
+				control.plot_disc(c.x,c.y,config.COLOR_ALT5,4)
 
 def trataInf(atual,Q,beach):
 	leaf = atual.leaf
@@ -103,6 +105,7 @@ def fortune(l, triang):
 	high_y = None
 	cur_c = None
 	y_count = 1
+	last_y = None
 	for p in l:
 		if p.x > max_x:
 			max_x = p.x
@@ -125,7 +128,7 @@ def fortune(l, triang):
 	yd = max_y - min_y
 	xd = max_x - min_x
 	dd = max(yd,xd)
-	mfactor = 0.7
+	mfactor = 0.6
 	bounds = {"maxx":(max_x + min_x)/2 + dd*mfactor, "minx":(max_x + min_x)/2 - dd*mfactor, "maxy":(max_y + min_y)/2 + dd*mfactor,"miny":(max_y + min_y)/2 - dd*mfactor}
 	Beach.bounds = bounds
 
@@ -158,6 +161,7 @@ def fortune(l, triang):
 					#control.plot_delete(i)
 		if atual.isInf:
 			pass
+			print('inf')
 			#trataInf(atual, Q, Beach)
 		else:
 			if atual.isPonto:
@@ -171,12 +175,13 @@ def fortune(l, triang):
 			control.thaw_update()
 			control.update()
 			control.sleep()
-
 		if lineid is not None: control.plot_delete(lineid)
 		if parabola_list is not None:
 			for i in parabola_list:
 				control.plot_delete(i)
+		#if last_y is not None and last_y > atual.y:
 		Beach.trata_extremos(atual.y)
+		last_y = atual.y
 
 	lower = Beach.bounds["miny"] - 2*(Beach.bounds["maxx"]-Beach.bounds["miny"])
 	partiallines = Beach.draw_partial(lower)
