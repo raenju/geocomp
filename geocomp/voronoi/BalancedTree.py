@@ -103,6 +103,9 @@ class BeachLine:
 			stpy = (q.y*q.y - (p.x-q.x)*(p.x-q.x) - p.y*p.y)/(2*(q.y-p.y))
 			stp = Ponto(q.x,stpy)
 
+			newnode.startp = stp
+			newnode2.startp = stp
+
 			# Atualiza o apontador da raiz, caso seja necessário
 			if self.root == node:
 				self.root = node.parent
@@ -112,67 +115,77 @@ class BeachLine:
 			cnode = self.next_leaf(newnode2)
 			if cnode is not None:
 				lp = self.circleLowerPoint(cnode.value, node.value, value)
-				lp.leaf = rleaf
-				rleaf.event = lp 
-				circleevents.append(rleaf)
-			else:
-				p = newnode2.value[0]
-				q = newnode2.value[1]
-				x0 = self.bounds["maxx"]
-				yv = 0
-				pt = None
-				ptc = None
-				if(p.y == q.y):
-					ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
-					dt = self.bounds["maxy"]-self.bounds["miny"]
-					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
+				if lp is None: # Os pontos não formam um circulo
+					if p.x > q.x:
+						pl,ql = q,p
+					else:
+						pl,ql = p,q
+					if pl.y > ql.y:
+						x0 = self.bounds["minx"]
+					else:
+						x0 = self.bounds["maxx"]
+					if p.y == q.y:
+						ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+						dt = self.bounds["maxy"]-self.bounds["miny"]
+						pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
+					else:
+						yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
+						ptc = Ponto(x0,yv)
+						dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+						pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
+					if pt.y > value.y:
+						pt.y = value.y
+					pt.leaf = rleaf
+					pt.isInf = True
+					pt.center = ptc
+
+					rleaf.startp = stp
+
+					rleaf.pair = (p,q)
+					rleaf.event = pt
+					circleevents.append(rleaf)
 				else:
-					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
-					ptc = Ponto(x0,yv)
-					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
-				if pt.y > value.y:
-					pt.y = value.y
-				pt.leaf = rleaf
-				pt.isInf = True
-				pt.center = ptc
-				rleaf.startp = stp
-				rleaf.event = pt
-				rleaf.pair = (p,q)
-				circleevents.append(rleaf)
+					lp.leaf = rleaf
+					rleaf.event = lp 
+					circleevents.append(rleaf)
 
 			# Encontra o node 'anterior', para termos as triplas que determinam eventos-circulo
 			cnode = self.prev_leaf(newnode)
 			if cnode is not None:
 				lp = self.circleLowerPoint(cnode.value, node.value, value)
-				lp.leaf = node
-				node.event = lp
-				circleevents.append(node)
-			else:
-				p = newnode.value[0]
-				q = newnode.value[1]
-				x0 = self.bounds["minx"]
-				yv = 0
-				pt = None
-				ptc = None
-				if(p.y == q.y):
-					ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
-					dt = self.bounds["maxy"]-self.bounds["miny"]
-					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
+				if lp is None: # Os pontos não formam um circulo
+					if p.x > q.x:
+						pl,ql = q,p
+					else:
+						pl,ql = p,q
+					if pl.y > ql.y:
+						x0 = self.bounds["minx"]
+					else:
+						x0 = self.bounds["maxx"]
+					if p.y == q.y:
+						ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+						dt = self.bounds["maxy"]-self.bounds["miny"]
+						pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
+					else:
+						yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
+						ptc = Ponto(x0,yv)
+						dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+						pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
+					if pt.y > value.y:
+						pt.y = value.y
+					pt.leaf = node
+					pt.isInf = True
+					pt.center = ptc
+
+					node.startp = stp
+
+					node.pair = (p,q)
+					node.event = pt
+					circleevents.append(node)
 				else:
-					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
-					ptc = Ponto(x0,yv)
-					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
-				if pt.y > value.y:
-					pt.y = value.y
-				pt.leaf = node
-				pt.isInf = True
-				pt.center = ptc
-				node.startp = stp
-				node.event = pt
-				node.pair = (p,q)
-				circleevents.append(node)
+					lp.leaf = node
+					node.event = lp
+					circleevents.append(node)
 
 			arc = [newnode, lleaf, newnode2]
 
@@ -190,10 +203,200 @@ class BeachLine:
 				return self.insereRec(value, node.right, c)
 
 
+	# Remove um nó da árvore
+	def remove_circ(self, leaf):
+		prox = None
+		proxn = None
+		ant = None
+		antn = None
+		if not leaf.still:
+			return [None, None, None]
+		leaf.still = False
+		cnode = self.next_leaf(leaf)
+		if cnode is not None:
+			prox = cnode.value
+			proxn = cnode
+
+		cnode = self.prev_leaf(leaf)
+		if cnode is not None:
+			ant = cnode.value
+			antn = cnode
+
+		# Os nós internos a serem removidos são (leaf.value, prox) e (ant, leaf.value)
+
+		pred = None
+		suc = None
+		novo = None
+
+		if prox is not None:
+			suc = TNode([leaf.value, prox])
+		else:
+			return [None,None,None]
+		if ant is not None:
+			pred = TNode([ant,leaf.value])
+		else:
+			return [None,None,None]
+		if ant is not None and prox is not None:
+			novo = TNode([antn,proxn])
+
+		# Encontra os dois nós internos que vão ser removidos, de acordo com a distancia da folha
+		if prox is not None and ant is not None:
+			low = None
+			high = None
+			cnode = leaf.parent
+			proxtaken = False
+			anttaken = False
+			while cnode is not None:
+				if (not proxtaken) and ((cnode.value[0] == leaf.value and cnode.value[1] == prox) or (cnode.value[1] == leaf.value and cnode.value[0] == prox)):
+					proxtaken = True
+					suc.value = cnode.value
+					suc.startp = cnode.startp
+					suc.event = cnode.event
+					if low is None:
+						low = cnode
+					else:
+						if high is None:
+							high = cnode
+						else:
+							print('erro? Nós internos repetido 1')
+				if (not anttaken) and ((cnode.value[0] == ant and cnode.value[1] == leaf.value) or (cnode.value[1] == ant and cnode.value[0] == leaf.value)):
+					anttaken = True
+					pred.value = cnode.value
+					pred.startp = cnode.startp
+					pred.event = cnode.event
+					if low is None:
+						low = cnode
+					else:
+						if high is None:
+							high = cnode
+						else:
+							print('erro? Nós internos repetidos 2')
+				cnode = cnode.parent
+
+			if low is None or high is None:
+				print('Erro. low ou high é None, ambos deviam ter valor')
+			high.value = [ant,prox]
+			high.startp = leaf.event.center
+			novo.startp = leaf.event.center
+			nroot = None
+			if low.left == leaf:
+				nroot = low.right
+			else:
+				if low.right == leaf:
+					nroot = low.left
+				else:
+					print('Erro? leaf deveria ser filho de low')
+			nroot.parent = low.parent
+			if low.parent.left == low:
+				low.parent.left = nroot
+			else:
+				low.parent.right = nroot
+
+		# Retorna os nós internos das divisões que sumiram, e a divisão nova.
+		# Precisa adicionar os eventos circulo da divisão nova (novo[0], novo[1], prox(novo[1])) (ant(novo[0]),novo[0],novo[1])
+		return [pred,suc,high]
 
 
+	def atualiza_eventos_circ(self,novo,liney,apred,asuc):
+		circleevents = []
+		removeevents = []
+		p = novo.value[0]
+		q = novo.value[1]
 
+		nxt = novo.right
+		while nxt.left is not None:
+			nxt = nxt.left
+		ant = novo.left
+		while ant.right is not None:
+			ant = ant.right
+		nxt = self.next_leaf(nxt)
+		ant = self.prev_leaf(ant)
+		stp = novo.startp
+		if (nxt is not None) and (nxt.value == p):
+			nxt = self.next_leaf(nxt)
+			ant = self.prev_leaf(ant)
+			r = p
+			p = q
+			q = r
+		if nxt is not None and (nxt.value == p or nxt.value == q or nxt.value == apred.value[1]):
+			nxt = None
+		if ant is not None and (ant.value == p or ant.value == q or ant.value == apred.value[1]):
+			ant = None
+		if nxt is not None:
+			q_leaf = self.prev_leaf(nxt)
+			lp = self.circleLowerPoint(nxt.value, p, q)
+			if lp is None:
+				if p.x > q.x:
+					pl,ql = q,p
+				else:
+					pl,ql = p,q
+				if pl.y > ql.y:
+					x0 = self.bounds["minx"]
+				else:
+					x0 = self.bounds["maxx"]
+				if p.y == q.y:
+					ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+					dt = self.bounds["maxy"]-self.bounds["miny"]
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
+				else:
+					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
+					ptc = Ponto(x0,yv)
+					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
+				pt.leaf = q_leaf
+				pt.isInf = True
+				pt.center = ptc
+				q_leaf.startp = stp
+				#q_leaf.startp = ptc
+				q_leaf.pair = (p,q)
+				q_leaf.event = pt
+				circleevents.append(q_leaf)
+			else:
+				if q_leaf.event is not None:
+					removeevents.append(q_leaf.event)
+				lp.leaf = q_leaf
+				q_leaf.event = lp
+				circleevents.append(q_leaf)
+		
+		if ant is not None:
+			p_leaf = self.next_leaf(ant)
+			lp = self.circleLowerPoint(ant.value, p, q)
+			if lp is None:
+				if p.x > q.x:
+					pl,ql = q,p
+				else:
+					pl,ql = p,q
+				if pl.y > ql.y:
+					x0 = self.bounds["minx"]
+				else:
+					x0 = self.bounds["maxx"]
+				if p.y == q.y:
+					ptc = Ponto((p.x+q.x)/2,self.bounds["miny"])
+					dt = self.bounds["maxy"]-self.bounds["miny"]
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
+				else:
+					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
+					ptc = Ponto(x0,yv)
+					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
+				pt.leaf = p_leaf
+				pt.isInf = True
+				pt.center = ptc
+				p_leaf.startp = stp
+				#p_leaf.startp = ptc
+				p_leaf.pair = (p,q)
+				p_leaf.event = pt
+				circleevents.append(p_leaf)
+			else:
+				if p_leaf.event is not None:
+					removeevents.append(p_leaf.event)
+				lp.leaf = p_leaf
+				p_leaf.event = lp
+				circleevents.append(p_leaf)
 
+		if stp.y <= self.bounds["miny"]:
+			circleevents = []
+		return circleevents,removeevents
 
 
 
@@ -273,13 +476,17 @@ class BeachLine:
 						yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 						ptc = Ponto(x0,yv)
 						dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-						pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+						pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 					if pt.y > value.y:
 						pt.y = value.y
 					pt.leaf = rleaf
 					pt.isInf = True
 					pt.center = ptc
+
 					rleaf.startp = stp
+					#rleaf.startp = ptc
+					newnode2.startp = ptc
+
 					rleaf.pair = (p,q)
 					rleaf.event = pt
 					circleevents.append(rleaf)
@@ -302,13 +509,24 @@ class BeachLine:
 					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 					ptc = Ponto(x0,yv)
 					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 				if pt.y > value.y:
 					pt.y = value.y
 				pt.leaf = rleaf
 				pt.isInf = True
 				pt.center = ptc
+
 				rleaf.startp = stp
+				#rleaf.startp = ptc
+
+				# if self.prev_leaf(newnode) is None:
+				# 	if p.x >= q.x:
+				# 		pl,ql = q,p
+				# 	else:
+				# 		pl,ql = p,q
+				# 	if pl.y >= ql.y:
+				# 		newnode.startp = ptc
+
 				rleaf.event = pt
 				rleaf.pair = (p,q)
 				circleevents.append(rleaf)
@@ -334,13 +552,17 @@ class BeachLine:
 						yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 						ptc = Ponto(x0,yv)
 						dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-						pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+						pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 					if pt.y > value.y:
 						pt.y = value.y
 					pt.leaf = node
 					pt.isInf = True
 					pt.center = ptc
+
 					node.startp = stp
+					#node.startp = ptc
+					newnode.startp = ptc
+
 					node.pair = (p,q)
 					node.event = pt
 					circleevents.append(node)
@@ -363,13 +585,24 @@ class BeachLine:
 					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 					ptc = Ponto(x0,yv)
 					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 				if pt.y > value.y:
 					pt.y = value.y
 				pt.leaf = node
 				pt.isInf = True
 				pt.center = ptc
+
 				node.startp = stp
+				#node.startp = ptc
+
+				# if self.next_leaf(newnode2) is None:
+				# 	if p.x >= q.x:
+				# 		pl,ql = q,p
+				# 	else:
+				# 		pl,ql = p,q
+				# 	if pl.y <= ql.y:
+				# 		newnode2.startp = ptc
+
 				node.event = pt
 				node.pair = (p,q)
 				circleevents.append(node)
@@ -835,11 +1068,12 @@ class BeachLine:
 					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 					ptc = Ponto(x0,yv)
 					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 				pt.leaf = q_leaf
 				pt.isInf = True
 				pt.center = ptc
 				q_leaf.startp = stp
+				#q_leaf.startp = ptc
 				q_leaf.pair = (p,q)
 				q_leaf.event = pt
 				circleevents.append(q_leaf)
@@ -864,7 +1098,7 @@ class BeachLine:
 				y0 = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 				ptc = Ponto(x0,y0)
 				dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-				pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+				pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 			if pt.y <= liney:
 				if q_leaf.event is not None:
 					removeevents.append(q_leaf.event)
@@ -872,6 +1106,7 @@ class BeachLine:
 				pt.isInf = True
 				pt.center = ptc
 				q_leaf.startp = stp
+				#q_leaf.startp = ptc
 				q_leaf.event = pt
 				q_leaf.pair = (p,q)
 				circleevents.append(q_leaf)
@@ -896,11 +1131,12 @@ class BeachLine:
 					yv = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 					ptc = Ponto(x0,yv)
 					dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-					pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+					pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 				pt.leaf = p_leaf
 				pt.isInf = True
 				pt.center = ptc
 				p_leaf.startp = stp
+				#p_leaf.startp = ptc
 				p_leaf.pair = (p,q)
 				p_leaf.event = pt
 				circleevents.append(p_leaf)
@@ -925,7 +1161,7 @@ class BeachLine:
 				y0 = ((q.x-x0)*(q.x-x0) + q.y*q.y - (p.x-x0)*(p.x-x0) - p.y*p.y)/(2*(q.y-p.y))
 				ptc = Ponto(x0,y0)
 				dt = math.sqrt((ptc.x-stp.x)*(ptc.x-stp.x) + (ptc.y-stp.y)*(ptc.y-stp.y))
-				pt = Ponto(ptc.x,ptc.y-dt,isPonto=False)
+				pt = Ponto(ptc.x,ptc.y-2*dt,isPonto=False)
 			if pt.y <= liney:
 				if p_leaf.event is not None:
 					removeevents.append(p_leaf.event)
@@ -933,6 +1169,7 @@ class BeachLine:
 				pt.isInf = True
 				pt.center = ptc
 				p_leaf.startp = stp
+				#p_leaf.startp = ptc
 				p_leaf.event = pt
 				p_leaf.pair = (p,q)
 				circleevents.append(p_leaf)
@@ -941,10 +1178,7 @@ class BeachLine:
 			circleevents = []
 		return circleevents,removeevents
 
-	# Remove folhas que não influenciam na região visível do diagrama. Não usado no projeto - NAO TESTADO
-	def trim(self, c):
-		if self.root is None:
-			return
+	def left_out(self,c):
 		node = self.root
 		while node.left is not None:
 			node = node.left
@@ -952,15 +1186,52 @@ class BeachLine:
 		if nnode is not None:
 			x = self.parabolaIntersectX(node.value,nnode.value,c)
 			if x < self.bounds["minx"]:
-				self.removeInf(node)
+				return True
+		return False
+
+	def right_out(self,c):
 		node = self.root
 		while node.right is not None:
 			node = node.right
-		nnode = self.prev_leaf(node)
+		nnode = self.next_leaf(node)
 		if nnode is not None:
-			x = self.parabolaIntersectX(nnode.value,node.value,c)
+			x = self.parabolaIntersectX(node.value,nnode.value,c)
 			if x > self.bounds["maxx"]:
-				self.removeInf(node)
+				return True
+		return False
+
+	def remove_left(self):
+		node = self.root
+		while node.left is not None:
+			node = node.left
+		node = node.parent
+		if node == self.root:
+			self.root = node.right
+			self.root.parent = None
+		else:
+			node.right.parent = node.parent
+			node.parent.left = node.right
+
+	def remove_right(self):
+		node = self.root
+		while node.right is not None:
+			node = node.right
+		node = node.parent
+		if node == self.root:
+			self.root = node.left
+			self.root.parent = None
+		else:
+			node.left.parent = node.parent
+			node.parent.right = node.left
+
+	def trata_extremos(self,c):
+		if self.root is None:
+			return
+		while self.left_out(c):
+			self.remove_left()
+		while self.right_out(c):
+			self.remove_right()
+
 
 	# Desenha as parábolas da linha da praia
 	def draw_parabolas(self, c):

@@ -14,7 +14,7 @@ edges = []
 DelaunayTriangDraw = None
 
 def trataPonto(atual,Q,beach):
-	ins = beach.insert(atual,atual.y)
+	ins = beach.insere(atual,atual.y)
 	circleevents = ins[0]
 	toRemove = ins[1]
 	arcs = ins[2]
@@ -30,7 +30,7 @@ def trataPonto(atual,Q,beach):
 		drawDelaunayEdge(p.x,p.y,q.x,q.y)
  
 def trataCirculo(atual,Q,beach):
-	pred,suc,novo = beach.remove(atual.leaf)
+	pred,suc,novo = beach.remove_circ(atual.leaf)
 	if pred is not None:
 		idc = control.plot_segment(pred.startp.x,pred.startp.y,novo.startp.x,novo.startp.y)
 		edges.append((Ponto(pred.startp.x,pred.startp.y),Ponto(novo.startp.x,novo.startp.y)))
@@ -41,7 +41,7 @@ def trataCirculo(atual,Q,beach):
 	if novo is not None:
 		p,q = novo.value
 		drawDelaunayEdge(p.x,p.y,q.x,q.y)
-		evc,rem = beach.atualiza_eventos(novo,atual.y,pred,suc)
+		evc,rem = beach.atualiza_eventos_circ(novo,atual.y,pred,suc)
 		for ev in rem:
 			Q.take(ev)
 		for ev in evc:
@@ -154,10 +154,11 @@ def fortune(l, triang):
 					control.plot_delete(i)
 			if partiallines is not None:
 				for i in partiallines:
-					control.plot_delete(i)
-
+					pass
+					#control.plot_delete(i)
 		if atual.isInf:
-			trataInf(atual, Q, Beach)
+			pass
+			#trataInf(atual, Q, Beach)
 		else:
 			if atual.isPonto:
 				trataPonto(atual, Q, Beach)
@@ -175,6 +176,10 @@ def fortune(l, triang):
 		if parabola_list is not None:
 			for i in parabola_list:
 				control.plot_delete(i)
+		Beach.trata_extremos(atual.y)
+
+	lower = Beach.bounds["miny"] - 2*(Beach.bounds["maxx"]-Beach.bounds["miny"])
+	partiallines = Beach.draw_partial(lower)
 
 	if Beach.llist:
 		for i in range(len(Beach.llist)-1):
