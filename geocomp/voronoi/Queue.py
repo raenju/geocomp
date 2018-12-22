@@ -1,4 +1,4 @@
-
+from .heep import *
 from geocomp.common.segment import Segment
 from geocomp.common import control
 from geocomp.common.guiprim import *
@@ -31,7 +31,35 @@ class Node:
 
 
 class EventQueue:
+	def __init__(self):
+		self.n = 0
+		self.fila = []
+		self.isIn = {}
 
+	def put(self, item, key):
+		if (key.x, key.y) in self.isIn:
+			return
+		self.n += 1
+		inv = [item.y, item.x, item, True]
+		self.isIn[(key.x, key.y)] = inv
+		heappush(self.fila, inv)
+
+	def take(self, key):
+		if (key.x, key.y) not in self.isIn:
+			return
+		taken = self.isIn.pop((key.x, key.y))
+		taken[-1] = False
+		self.n -= 1
+
+	def takeHighest(self):
+		while self.fila:
+			item = heappop(self.fila)
+			key = item[2]
+			if item[-1]:
+				self.n -= 1
+				del self.isIn[(key.x, key.y)]
+				return key
+"""
 	def __init__(self):
 		self.root = None
 		self.size = 0
@@ -209,3 +237,4 @@ class EventQueue:
 		self.tpr(node.left)
 		print(node.item.x,node.item.y)
 		self.tpr(node.right)
+		"""
