@@ -137,28 +137,24 @@ def fortune(l, triang):
 		for i in range(len(aligned)-1):
 			drawDelaunayEdge(aligned[i].x,aligned[i].y,aligned[i+1].x,aligned[i+1].y)
 		Beach.create_particular(aligned)
-<<<<<<< HEAD
+
 	#while Q.root is not None:
 	while Q.n > 0:
-=======
-
-
-	while Q.root is not None:
->>>>>>> d50812aef27e97493a98831835e1ffd9c57f7ada
 		atual = Q.takeHighest()
 		# Desenha a linha de varredura e as parabolas
-		control.freeze_update()
-		if lineid is not None: control.plot_delete(lineid)
-		if cur_c is not None:
-			control.plot_delete(cur_c)
-			cur_c = None
-		lineid = control.plot_horiz_line(atual.y)
-		if parabola_list is not None:
-			for i in parabola_list:
-				control.plot_delete(i)
-		if partiallines is not None:
-			for i in partiallines:
-				control.plot_delete(i)
+		if not atual.isInf:
+			control.freeze_update()
+			if lineid is not None: control.plot_delete(lineid)
+			if cur_c is not None:
+				control.plot_delete(cur_c)
+				cur_c = None
+			lineid = control.plot_horiz_line(atual.y)
+			if parabola_list is not None:
+				for i in parabola_list:
+					control.plot_delete(i)
+			if partiallines is not None:
+				for i in partiallines:
+					control.plot_delete(i)
 
 		if atual.isInf:
 			trataInf(atual, Q, Beach)
@@ -168,16 +164,17 @@ def fortune(l, triang):
 			else:
 				cur_c = control.plot_disc(atual.x,atual.y,config.COLOR_ALT5,4)
 				trataCirculo(atual, Q, Beach)
-		parabola_list = Beach.draw_parabolas(atual.y)
-		partiallines = Beach.draw_partial(atual.y)
-		control.thaw_update()
-		control.update()
-		control.sleep()
+		if not atual.isInf:
+			parabola_list = Beach.draw_parabolas(atual.y)
+			partiallines = Beach.draw_partial(atual.y)
+			control.thaw_update()
+			control.update()
+			control.sleep()
 
-	if lineid is not None: control.plot_delete(lineid)
-	if parabola_list is not None:
-		for i in parabola_list:
-			control.plot_delete(i)
+		if lineid is not None: control.plot_delete(lineid)
+		if parabola_list is not None:
+			for i in parabola_list:
+				control.plot_delete(i)
 
 	if Beach.llist:
 		for i in range(len(Beach.llist)-1):
