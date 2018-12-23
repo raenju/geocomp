@@ -13,23 +13,25 @@ min_y = None
 edges = []
 DelaunayTriangDraw = None
 
-def trataPonto(atual,Q,beach):
+def trataPonto(atual,Q,beach,CircDraw):
 	ins = beach.insere(atual,atual.y)
 	circleevents = ins[0]
 	toRemove = ins[1]
 	arcs = ins[2]
 	if toRemove:
+		CircDraw.rem_point(toRemove.x,toRemove.y)
 		Q.take(toRemove)
 	for ev in circleevents:
 		c = ev.event
 		if c.y <= atual.y:
+			CircDraw.add_point(c.x,c.y)
 			Q.put(c,c)
 	# arc contém uma aresta de voronoi, logo as regioes que divide são vizinhas, e existe uma aresta de delaunay entre seus pontos
 	if arcs:
 		p,q = arcs[0].value
 		drawDelaunayEdge(p.x,p.y,q.x,q.y)
  
-def trataCirculo(atual,Q,beach):
+def trataCirculo(atual,Q,beach,CircDraw):
 	pred,suc,novo = beach.remove_circ(atual.leaf)
 	if pred is not None:
 		idc = control.plot_segment(pred.startp.x,pred.startp.y,novo.startp.x,novo.startp.y)
@@ -43,10 +45,12 @@ def trataCirculo(atual,Q,beach):
 		drawDelaunayEdge(p.x,p.y,q.x,q.y)
 		evc,rem = beach.atualiza_eventos_circ(novo,atual.y,pred,suc)
 		for ev in rem:
+			CircDraw.rem_point(ev.x,ev.y)
 			Q.take(ev)
 		for ev in evc:
 			c = ev.event
 			if c.y <= atual.y:
+				CircDraw.add_point(c.x,c.y)
 				Q.put(c,c)
 
 def trataInf(atual,Q,beach):
@@ -78,6 +82,27 @@ def lineIntersect(p1,q1,p2,q2):
 
 	return x,y
 
+class draw_circ_events:
+	def __init__(self):
+		self.points = {}
+
+	def add_point(self,x,y):
+		key = (x,y)
+		if key not in self.points.keys():
+			self.points[key] = [None, 0]
+		if self.points[key][1] == 0:
+			self.points[key][0] = control.plot_disc(x,y,config.COLOR_ALT3,3)
+		self.points[key][1] = self.points[key][1] + 1
+
+	def rem_point(self,x,y):
+		key = (x,y)
+		if key not in self.points.keys():
+			return
+		if self.points[key][1] == 1:
+			control.plot_delete(self.points[key][0])
+			self.points[key][0] = None
+		self.points[key][1] = self.points[key][1] - 1
+
 def fortEnv(l):
 	fortune(l,True)
 
@@ -92,6 +117,7 @@ def fortune(l, triang):
 	Q = EventQueue()
 	Beach = BeachLine()
 	Vor = dcel()
+	CircDraw = draw_circ_events()
 	global DelaunayTriangDraw
 	DelaunayTriangDraw = triang
 	lineid = None
@@ -163,10 +189,11 @@ def fortune(l, triang):
 			#trataInf(atual, Q, Beach)
 		else:
 			if atual.isPonto:
-				trataPonto(atual, Q, Beach)
+				trataPonto(atual, Q, Beach, CircDraw)
 			else:
 				cur_c = control.plot_disc(atual.x,atual.y,config.COLOR_ALT5,4)
-				trataCirculo(atual, Q, Beach)
+				CircDraw.rem_point(atual.x,atual.y)
+				trataCirculo(atual, Q, Beach, CircDraw)
 		if not atual.isInf:
 			parabola_list = Beach.draw_parabolas(atual.y)
 			partiallines = Beach.draw_partial(atual.y)
@@ -180,11 +207,15 @@ def fortune(l, triang):
 		#if last_y is not None and last_y > atual.y:
 		evlist = Beach.trata_extremos(atual.y)
 		for ev in evlist:
+			CircDraw.rem_point(ev.x,ev.y)
 			Q.take(ev)
 		last_y = atual.y
 
 	lower = Beach.bounds["miny"] - 2*(Beach.bounds["maxx"]-Beach.bounds["miny"])
 	partiallines = Beach.draw_partial(lower)
+	if cur_c is not None:
+		control.plot_delete(cur_c)
+		cur_c = None
 
 	if Beach.llist:
 		for i in range(len(Beach.llist)-1):
