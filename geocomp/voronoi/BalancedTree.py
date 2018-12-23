@@ -1146,6 +1146,9 @@ class BeachLine:
 		node = self.root
 		while node.left is not None:
 			node = node.left
+		node.still = False
+		node.parent.stll = False
+		ev = node.event
 		node = node.parent
 		if node == self.root:
 			self.root = node.right
@@ -1153,11 +1156,15 @@ class BeachLine:
 		else:
 			node.right.parent = node.parent
 			node.parent.left = node.right
+		return ev
 
 	def remove_right(self):
 		node = self.root
 		while node.right is not None:
 			node = node.right
+		node.still = False
+		node.parent.still = False
+		ev = node.event
 		node = node.parent
 		if node == self.root:
 			self.root = node.left
@@ -1165,14 +1172,21 @@ class BeachLine:
 		else:
 			node.left.parent = node.parent
 			node.parent.right = node.left
+		return ev
 
 	def trata_extremos(self,c):
 		if self.root is None:
 			return
+		evlist = []
 		while self.left_out(c):
-			self.remove_left()
+			ev = self.remove_left()
+			if ev is not None:
+				evlist.append(ev)
 		while self.right_out(c):
-			self.remove_right()
+			ev = self.remove_right()
+			if ev is not None:
+				evlist.append(ev)
+		return evlist
 
 
 	# Desenha as parábolas da linha da praia

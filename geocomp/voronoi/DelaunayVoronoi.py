@@ -178,7 +178,9 @@ def fortune(l, triang):
 			for i in parabola_list:
 				control.plot_delete(i)
 		#if last_y is not None and last_y > atual.y:
-		Beach.trata_extremos(atual.y)
+		evlist = Beach.trata_extremos(atual.y)
+		for ev in evlist:
+			Q.take(ev)
 		last_y = atual.y
 
 	lower = Beach.bounds["miny"] - 2*(Beach.bounds["maxx"]-Beach.bounds["miny"])
