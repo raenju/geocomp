@@ -185,6 +185,7 @@ def fortune(l, triang):
 			CircDraw.rem_point(ev.x,ev.y)
 			Q.take(ev)
 		last_y = atual.y
+		#Beach.test_bfsprint()
 
 	lower = last_y - 2*(Beach.bounds["maxy"]-Beach.bounds["miny"])
 	partiallines = Beach.draw_partial(lower)

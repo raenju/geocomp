@@ -38,6 +38,8 @@ class BeachLine:
 
 	# Encontra o 'próximo' node
 	def next_leaf(self,node):
+		if node is None:
+			return None
 		cnode = node
 		while cnode.parent is not None:
 			if cnode == cnode.parent.left:
@@ -52,6 +54,8 @@ class BeachLine:
 
 	# Encontra o node 'anterior'
 	def prev_leaf(self,node):
+		if node is None:
+			return None
 		cnode = node
 		while cnode.parent is not None:
 			if cnode == cnode.parent.right:
@@ -136,27 +140,43 @@ class BeachLine:
 			while node.parent is not None:
 				if node.parent.left == node:
 					node.parent.balance = node.parent.balance - c_height
-					if node.parent.balance >= 0:
-						c_height = 0
-					else: 
-						if node.parent.balance + c_height >= 0:
+					if node.parent.balance + c_height >= 0:
+						if node.parent.balance >= 0:
+							c_height = 0
+						else:
 							c_height = -node.parent.balance
 				else:
 					node.parent.balance = node.parent.balance + c_height
-					if node.parent.balance <= 0:
-						c_height = 0
-					else:
-						if node.parent.balance - c_height  <= 0:
+					if node.parent.balance - c_height <= 0:
+						if node.parent.balance <= 0:
+							c_height = 0
+						else:
 							c_height = node.parent.balance
 				node = node.parent
+			# while node.parent is not None:
+			# 	if node.parent.left == node:
+			# 		node.parent.balance = node.parent.balance - c_height
+			# 		if node.parent.balance >= 0:
+			# 			c_height = 0
+			# 		else: 
+			# 			if node.parent.balance + c_height >= 0:
+			# 				c_height = -node.parent.balance
+			# 	else:
+			# 		node.parent.balance = node.parent.balance + c_height
+			# 		if node.parent.balance <= 0:
+			# 			c_height = 0
+			# 		else:
+			# 			if node.parent.balance - c_height  <= 0:
+			# 				c_height = node.parent.balance
+			# 	node = node.parent
 
-			# # Balanceamento
-			# bnode = newnode.parent
-			# while bnode is not None:
-			# 	if bnode.balance > 1 or bnode.balance < -1:
-			# 		self.rebalance(bnode)
-			# 	bnode = bnode.parent
-			# ####
+			# Balanceamento
+			bnode = newnode.parent
+			while bnode is not None:
+				if bnode.balance > 1 or bnode.balance < -1:
+					self.rebalance(bnode)
+				bnode = bnode.parent
+			####
 
 			arc = [newnode, lleaf, newnode2]
 
@@ -262,6 +282,23 @@ class BeachLine:
 				low.parent.left = nroot
 			else:
 				low.parent.right = nroot
+			bnode = nroot
+			variation = -1
+			while bnode.parent is not None:
+				if bnode.parent.left == bnode:
+					bnode.parent.balance = bnode.parent.balance - variation
+					if bnode.parent.balance + variation >= 0:
+						variation = 0
+				else:
+					bnode.parent.balance = bnode.parent.balance + variation
+					if bnode.parent.balance - variation <= 0:
+						variation = 0
+				bnode = bnode.parent
+			bnode = nroot.parent
+			while bnode is not None:
+				if bnode.balance > 1 or bnode.balance < -1:
+					self.rebalance(bnode)
+				bnode = bnode.parent
 
 		# Retorna os nós internos das divisões que sumiram, e a divisão nova.
 		# Precisa adicionar os eventos circulo da divisão nova (novo[0], novo[1], prox(novo[1])) (ant(novo[0]),novo[0],novo[1])
@@ -320,50 +357,160 @@ class BeachLine:
 
 
 	# Rebalanceia um nó por meio de rotações. Leva em conta o balance do nó para o rebalanceamento
+	# Invariante: Todos os nós nas sub-árvores de node estão balanceados
 	def rebalance(self, node):
-		if node.balance > 1:
+		#return
+		nnode = None
+		if node.balance == 2:
 			if node.right.balance >= 0:
+				nnode = node.right
 				if node.right.balance == 0:
-					node.right.balance = node.right.balance - 1
-					node.balance = node.balance + 1
+					node.balance = 1
+					node.right.balance = -1
+					self.rotate_left(node)
 				else:
 					node.balance = 0
 					node.right.balance = 0
-				self.rotate_left(node)
+					self.rotate_left(node)
+					self.propagate(nnode)
 			else:
-				if node.right.left.balance > 0:
-					node.right.balance = 0
-					node.balance = 1 
-				elif node.right.left.balance == 0:
-					node.balance = 0
-					node.right.balance = 0
+				x = node
+				y = x.right
+				z = y.left
+				zb = z.balance
+				nnode = z
+				if zb == 1:
+					x.balance = -1
 				else:
-					node.balance =  1
-					node.right.balance = 0
-				node.right.left.balance = 0
-				self.rotate_right(node.right)
-				self.rotate_left(node)
-		if node.balance < -1:
+					x.balance = 0
+				if zb == -1:
+					y.balance = 1
+				else:
+					y.balance = 0
+				z.balance = 0
+				self.rotate_right(y)
+				self.rotate_left(x)
+				self.propagate(nnode)
+			return
+		if node.balance == 3:
+			x = node
+			y = x.right
+			yb = y.balance
+			nnode = y
+			if yb == 0:
+				x.balance = 2
+				y.balance = -1
+				self.rotate_left(x)
+				self.rebalance(node)
+			if yb == 1:
+				x.balance = 1
+				y.balance = 0
+				self.rotate_left(x)
+				self.propagate(nnode)
+			if yb == -1:
+				x.balance = 2
+				y.balance = -2
+				self.rotate_left(x)
+				self.rebalance(node)
+				self.rebalance(y)
+			return
+		if node.balance == -2:
 			if node.left.balance <= 0:
+				nnode = node.left
 				if node.left.balance == 0:
-					node.left.balance = node.left.balance + 1
-					node.balance = node.balance - 1
-				else:
-					node.balance = 0
-					node.left.balance = 0
-			else:
-				if node.left.right.balance > 0:
 					node.left.balance = 1
-					node.balance = 0
-				elif node.left.right.balance == 0:
-					node.balance = 0
-					node.left.balance = 0
-				else:
 					node.balance = -1
+					self.rotate_right(node)
+				else:
 					node.left.balance = 0
-				node.left.right.balance = 0
-				self.rotate_left(node.left)
-				self.rotate_right(node)
+					node.balance = 0
+					self.rotate_right(node)
+					self.propagate(nnode)
+			else:
+				x = node
+				y = x.left
+				z = y.right
+				zb = z.balance
+				nnode = z
+				if zb == 1:
+					y.balance = -1
+				else:
+					y.balance = 0
+				if zb == -1:
+					x.balance = 1
+				else:
+					x.balance = 0
+				z.balance = 0
+				self.rotate_left(y)
+				self.rotate_right(x)
+			self.propagate(nnode)
+			return
+		if node.balance == -3:
+			x = node
+			y = x.left
+			yb = y.balance
+			nnode = y
+			if yb == 0:
+				x.balance = -2
+				y.balance = 1
+				self.rotate_right(x)
+				self.rebalance(x)
+			if yb == 1:
+				x.balance = -2
+				y.balance = 2
+				self.rotate_right(x)
+				self.rebalance(x)
+				self.rebalance(y)
+			if yb == -1:
+				x.balance = -1
+				y.balance = 0
+				self.rotate_right(x)
+				self.propagate(nnode)
+			return
+	# def rebalance(self, node):
+	# 	if node.balance > 1:
+	# 		if node.right.balance >= 0:
+	# 			if node.right.balance == 0:
+	# 				node.right.balance = node.right.balance - 1
+	# 				node.balance = node.balance + 1
+	# 			else:
+	# 				node.balance = 0
+	# 				node.right.balance = 0
+	# 			self.rotate_left(node)
+	# 		else:
+	# 			if node.right.left.balance > 0:
+	# 				node.right.balance = 0
+	# 				node.balance = 1 
+	# 			elif node.right.left.balance == 0:
+	# 				node.balance = 0
+	# 				node.right.balance = 0
+	# 			else:
+	# 				node.balance =  1
+	# 				node.right.balance = 0
+	# 			node.right.left.balance = 0
+	# 			self.rotate_right(node.right)
+	# 			self.rotate_left(node)
+	# 	if node.balance < -1:
+	# 		if node.left.balance <= 0:
+	# 			if node.left.balance == 0:
+	# 				node.left.balance = node.left.balance + 1
+	# 				node.balance = node.balance - 1
+	# 			else:
+	# 				node.balance = 0
+	# 				node.left.balance = 0
+	# 		else:
+	# 			if node.left.right.balance > 0:
+	# 				node.left.balance = 1
+	# 				node.balance = 0
+	# 			elif node.left.right.balance == 0:
+	# 				node.balance = 0
+	# 				node.left.balance = 0
+	# 			else:
+	# 				node.balance = -1
+	# 				node.left.balance = 0
+	# 			node.left.right.balance = 0
+	# 			self.rotate_left(node.left)
+	# 			self.rotate_right(node)
 
 	# Rotação para a esquerda
 	def rotate_left(self,node):
@@ -412,6 +559,19 @@ class BeachLine:
 				nparent.left = lchild
 			else:
 				nparent.right = lchild
+
+	def propagate(self,node):
+		variation = 1
+		while node.parent is not None:
+			if node.parent.left == node:
+				node.parent.balance = node.parent.balance + variation
+				if node.parent.balance - variation >= 0:
+					variation = 0
+			else:
+				node.parent.balance = node.parent.balance - variation
+				if node.parent.balance + variation <= 0:
+					variation = 0
+			node = node.parent
 
 	# Cria a árvore inicial no caso de mais de um ponto estar na mesma horizontal, e serem os primeiros pontos encontrados
 	def create_particular(self, vec):
@@ -524,6 +684,8 @@ class BeachLine:
 
 	def left_out(self,c):
 		node = self.root
+		if node is None:
+			return False
 		while node.left is not None:
 			node = node.left
 		nnode = self.next_leaf(node)
@@ -535,6 +697,8 @@ class BeachLine:
 
 	def right_out(self,c):
 		node = self.root
+		if node is None:
+			return False
 		while node.right is not None:
 			node = node.right
 		nnode = self.prev_leaf(node)
@@ -559,6 +723,23 @@ class BeachLine:
 		else:
 			node.right.parent = node.parent
 			node.parent.left = node.right
+			bnode = node.parent.left
+			variation = -1
+			while bnode.parent is not None:
+				if bnode.parent.left == bnode:
+					bnode.parent.balance = bnode.parent.balance - variation
+					if bnode.parent.balance + variation >= 0:
+						variation = 0
+				else:
+					bnode.parent.balance = bnode.parent.balance + variation
+					if bnode.parent.balance - variation <= 0:
+						variation = 0
+				bnode = bnode.parent
+			bnode = node.parent
+			while bnode is not None:
+				if bnode.balance > 1 or bnode.balance < -1:
+					self.rebalance(bnode)
+				bnode = bnode.parent
 		return ev
 
 	def remove_right(self):
@@ -576,6 +757,23 @@ class BeachLine:
 		else:
 			node.left.parent = node.parent
 			node.parent.right = node.left
+			bnode = node.parent.right
+			variation = -1
+			while bnode.parent is not None:
+				if bnode.parent.left == bnode:
+					bnode.parent.balance = bnode.parent.balance - variation
+					if bnode.parent.balance + variation >= 0:
+						variation = 0
+				else:
+					bnode.parent.balance = bnode.parent.balance + variation
+					if bnode.parent.balance - variation <= 0:
+						variation = 0
+				bnode = bnode.parent
+			bnode = node.parent
+			while bnode is not None:
+				if bnode.balance > 1 or bnode.balance < -1:
+					self.rebalance(bnode)
+				bnode = bnode.parent
 		return ev
 
 	def trata_extremos(self,c):
@@ -649,6 +847,40 @@ class BeachLine:
 			return
 		else:
 			self.test_r2lprintrec(r.left)
-			print(r)
+			print(r,r.balance)
 			self.test_r2lprintrec(r.right)
 			return
+
+	def test_bfsprint(self):
+		if self.root is None:
+			return
+		self.test_consistentBalance()
+		stk = [[] for i in range(20)]
+		stk[0].append(self.root)
+		t = False
+		print("vvvv")
+		for i in range(20):
+			print("----")
+			for p in stk[i]:
+				print(p,p.balance)
+				if p.left is not None:
+					stk[i+1].append(p.left)
+					stk[i+1].append(p.right)
+					if p.right.pair-p.left.pair != p.balance:
+						print('inconsistence!!!!!!!!!!!!!')
+						t = True
+		if t:
+			print("Inconsistente")
+		print("^^^^")
+
+	def test_consistentBalance(self):
+		if self.root is None:
+			return True
+		self.test_height(self.root)
+
+	def test_height(self,node):
+		if node is None:
+			return -1
+		h = max(self.test_height(node.left)+1,self.test_height(node.right)+1)
+		node.pair = h
+		return h
