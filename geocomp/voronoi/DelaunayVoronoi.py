@@ -53,22 +53,6 @@ def trataCirculo(atual,Q,beach,CircDraw):
 				CircDraw.add_point(c.x,c.y)
 				Q.put(c,c)
 
-def trataInf(atual,Q,beach):
-	leaf = atual.leaf
-	if leaf.event is not None:
-		Q.take(leaf.event)
-	beach.removeInf(leaf)
-	st = leaf.startp
-	pt = leaf.event.center
-	if pt.x == beach.bounds["minx"]:
-		beach.llist.append(leaf.pair)
-	elif pt.x == beach.bounds["maxx"]:
-		beach.rlist.append(leaf.pair)
-	else:
-		beach.dlist.append(leaf.pair)
-	idc = control.plot_segment(st.x,st.y,pt.x,pt.y)
-	edges.append((Ponto(st.x,st.y),Ponto(pt.x,pt.y,isInf=True)))
-
 def lineIntersect(p1,q1,p2,q2):
 	if p1.y == q1.y or q2.y == p2.y:
 		return None,None
@@ -152,7 +136,7 @@ def fortune(l, triang):
 	yd = max_y - min_y
 	xd = max_x - min_x
 	dd = max(yd,xd)
-	mfactor = 0.6
+	mfactor = 0.7
 	bounds = {"maxx":(max_x + min_x)/2 + dd*mfactor, "minx":(max_x + min_x)/2 - dd*mfactor, "maxy":(max_y + min_y)/2 + dd*mfactor,"miny":(max_y + min_y)/2 - dd*mfactor}
 	Beach.bounds = bounds
 
@@ -169,42 +153,37 @@ def fortune(l, triang):
 	while Q.n > 0:
 		atual = Q.takeHighest()
 		# Desenha a linha de varredura e as parabolas
-		if not atual.isInf:
-			control.freeze_update()
-			if lineid is not None: control.plot_delete(lineid)
-			if cur_c is not None:
-				control.plot_delete(cur_c)
-				cur_c = None
-			lineid = control.plot_horiz_line(atual.y)
-			if parabola_list is not None:
-				for i in parabola_list:
-					control.plot_delete(i)
-			if partiallines is not None:
-				for i in partiallines:
-					pass
-					#control.plot_delete(i)
-		if atual.isInf:
-			pass
-			print('inf')
-			#trataInf(atual, Q, Beach)
+		control.freeze_update()
+		if lineid is not None: control.plot_delete(lineid)
+		if cur_c is not None:
+			control.plot_delete(cur_c)
+			cur_c = None
+		lineid = control.plot_horiz_line(atual.y)
+		if parabola_list is not None:
+			for i in parabola_list:
+				control.plot_delete(i)
+		if partiallines is not None:
+			for i in partiallines:
+				pass
+				#control.plot_delete(i)
+
+		if atual.isPonto:
+			trataPonto(atual, Q, Beach, CircDraw)
 		else:
-			if atual.isPonto:
-				trataPonto(atual, Q, Beach, CircDraw)
-			else:
-				cur_c = control.plot_disc(atual.x,atual.y,config.COLOR_ALT5,4)
-				CircDraw.rem_point(atual.x,atual.y)
-				trataCirculo(atual, Q, Beach, CircDraw)
-		if not atual.isInf:
-			parabola_list = Beach.draw_parabolas(atual.y)
-			partiallines = Beach.draw_partial(atual.y)
-			control.thaw_update()
-			control.update()
-			control.sleep()
+			cur_c = control.plot_disc(atual.x,atual.y,config.COLOR_ALT5,4)
+			CircDraw.rem_point(atual.x,atual.y)
+			trataCirculo(atual, Q, Beach, CircDraw)
+
+		parabola_list = Beach.draw_parabolas(atual.y)
+		partiallines = Beach.draw_partial(atual.y)
+		control.thaw_update()
+		control.update()
+		control.sleep()
 		if lineid is not None: control.plot_delete(lineid)
 		if parabola_list is not None:
 			for i in parabola_list:
 				control.plot_delete(i)
-		#if last_y is not None and last_y > atual.y:
+
 		evlist = Beach.trata_extremos(atual.y)
 		for ev in evlist:
 			CircDraw.rem_point(ev.x,ev.y)
