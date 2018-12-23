@@ -131,24 +131,24 @@ class BeachLine:
 
 			####
 			#Propagar as mudanças de balance
-			# node = newnode
-			# c_height = 2
-			# while node.parent is not None:
-			# 	if node.parent.left == node:
-			# 		node.parent.balance = node.parent.balance - c_height
-			# 		if node.parent.balance >= 0:
-			# 			c_height = 0
-			# 		else: 
-			# 			if node.parent.balance + c_height >= 0:
-			# 				c_height = -node.parent.balance
-			# 	else:
-			# 		node.parent.balance = node.parent.balance + c_height
-			# 		if node.parent.balance <= 0:
-			# 			c_height = 0
-			# 		else:
-			# 			if node.parent.balance - c_height  <= 0:
-			# 				c_height = node.parent.balance
-			# 	node = node.parent
+			node = newnode
+			c_height = 2
+			while node.parent is not None:
+				if node.parent.left == node:
+					node.parent.balance = node.parent.balance - c_height
+					if node.parent.balance >= 0:
+						c_height = 0
+					else: 
+						if node.parent.balance + c_height >= 0:
+							c_height = -node.parent.balance
+				else:
+					node.parent.balance = node.parent.balance + c_height
+					if node.parent.balance <= 0:
+						c_height = 0
+					else:
+						if node.parent.balance - c_height  <= 0:
+							c_height = node.parent.balance
+				node = node.parent
 
 			# # Balanceamento
 			# bnode = newnode.parent
@@ -297,27 +297,25 @@ class BeachLine:
 			q_leaf = self.prev_leaf(nxt)
 			lp = self.circleLowerPoint(nxt.value, p, q)
 			if lp is not None:
-				if q_leaf.event is not None:
-					removeevents.append(q_leaf.event)
-				lp.leaf = q_leaf
-				q_leaf.event = lp
-				circleevents.append(q_leaf)
+				if lp.center.y <= novo.startp.y:
+					if q_leaf.event is not None:
+						removeevents.append(q_leaf.event)
+					lp.leaf = q_leaf
+					q_leaf.event = lp
+					circleevents.append(q_leaf)
 		
 		if ant is not None:
 			p_leaf = self.next_leaf(ant)
 			lp = self.circleLowerPoint(ant.value, p, q)
 			if lp is not None:
-				if p_leaf.event is not None:
-					removeevents.append(p_leaf.event)
-				lp.leaf = p_leaf
-				p_leaf.event = lp
-				circleevents.append(p_leaf)
+				if lp.center.y <= novo.startp.y:
+					if p_leaf.event is not None:
+						removeevents.append(p_leaf.event)
+					lp.leaf = p_leaf
+					p_leaf.event = lp
+					circleevents.append(p_leaf)
 
-		if stp.y <= self.bounds["miny"]:
-			circleevents = []
 		return circleevents,removeevents
-
-
 
 
 

@@ -162,10 +162,6 @@ def fortune(l, triang):
 		if parabola_list is not None:
 			for i in parabola_list:
 				control.plot_delete(i)
-		if partiallines is not None:
-			for i in partiallines:
-				pass
-				#control.plot_delete(i)
 
 		if atual.isPonto:
 			trataPonto(atual, Q, Beach, CircDraw)
@@ -190,7 +186,7 @@ def fortune(l, triang):
 			Q.take(ev)
 		last_y = atual.y
 
-	lower = Beach.bounds["miny"] - 2*(Beach.bounds["maxx"]-Beach.bounds["miny"])
+	lower = last_y - 2*(Beach.bounds["maxy"]-Beach.bounds["miny"])
 	partiallines = Beach.draw_partial(lower)
 	if cur_c is not None:
 		control.plot_delete(cur_c)
