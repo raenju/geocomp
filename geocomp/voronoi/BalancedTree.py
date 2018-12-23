@@ -359,7 +359,6 @@ class BeachLine:
 	# Rebalanceia um nó por meio de rotações. Leva em conta o balance do nó para o rebalanceamento
 	# Invariante: Todos os nós nas sub-árvores de node estão balanceados
 	def rebalance(self, node):
-		#return
 		nnode = None
 		if node.balance == 2:
 			if node.right.balance >= 0:
@@ -443,7 +442,7 @@ class BeachLine:
 				z.balance = 0
 				self.rotate_left(y)
 				self.rotate_right(x)
-			self.propagate(nnode)
+				self.propagate(nnode)
 			return
 		if node.balance == -3:
 			x = node
@@ -467,50 +466,6 @@ class BeachLine:
 				self.rotate_right(x)
 				self.propagate(nnode)
 			return
-	# def rebalance(self, node):
-	# 	if node.balance > 1:
-	# 		if node.right.balance >= 0:
-	# 			if node.right.balance == 0:
-	# 				node.right.balance = node.right.balance - 1
-	# 				node.balance = node.balance + 1
-	# 			else:
-	# 				node.balance = 0
-	# 				node.right.balance = 0
-	# 			self.rotate_left(node)
-	# 		else:
-	# 			if node.right.left.balance > 0:
-	# 				node.right.balance = 0
-	# 				node.balance = 1 
-	# 			elif node.right.left.balance == 0:
-	# 				node.balance = 0
-	# 				node.right.balance = 0
-	# 			else:
-	# 				node.balance =  1
-	# 				node.right.balance = 0
-	# 			node.right.left.balance = 0
-	# 			self.rotate_right(node.right)
-	# 			self.rotate_left(node)
-	# 	if node.balance < -1:
-	# 		if node.left.balance <= 0:
-	# 			if node.left.balance == 0:
-	# 				node.left.balance = node.left.balance + 1
-	# 				node.balance = node.balance - 1
-	# 			else:
-	# 				node.balance = 0
-	# 				node.left.balance = 0
-	# 		else:
-	# 			if node.left.right.balance > 0:
-	# 				node.left.balance = 1
-	# 				node.balance = 0
-	# 			elif node.left.right.balance == 0:
-	# 				node.balance = 0
-	# 				node.left.balance = 0
-	# 			else:
-	# 				node.balance = -1
-	# 				node.left.balance = 0
-	# 			node.left.right.balance = 0
-	# 			self.rotate_left(node.left)
-	# 			self.rotate_right(node)
 
 	# Rotação para a esquerda
 	def rotate_left(self,node):
