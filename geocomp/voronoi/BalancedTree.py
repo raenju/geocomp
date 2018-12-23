@@ -131,32 +131,32 @@ class BeachLine:
 
 			####
 			#Propagar as mudanças de balance
-			node = newnode
-			c_height = 2
-			while node.parent is not None:
-				if node.parent.left == node:
-					node.parent.balance = node.parent.balance - c_height
-					if node.parent.balance >= 0:
-						c_height = 0
-					else: 
-						if node.parent.balance + c_height >= 0:
-							c_height = -node.parent.balance
-				else:
-					node.parent.balance = node.parent.balance + c_height
-					if node.parent.balance <= 0:
-						c_height = 0
-					else:
-						if node.parent.balance - c_height  <= 0:
-							c_height = node.parent.balance
-				node = node.parent
+			# node = newnode
+			# c_height = 2
+			# while node.parent is not None:
+			# 	if node.parent.left == node:
+			# 		node.parent.balance = node.parent.balance - c_height
+			# 		if node.parent.balance >= 0:
+			# 			c_height = 0
+			# 		else: 
+			# 			if node.parent.balance + c_height >= 0:
+			# 				c_height = -node.parent.balance
+			# 	else:
+			# 		node.parent.balance = node.parent.balance + c_height
+			# 		if node.parent.balance <= 0:
+			# 			c_height = 0
+			# 		else:
+			# 			if node.parent.balance - c_height  <= 0:
+			# 				c_height = node.parent.balance
+			# 	node = node.parent
 
-			# Balanceamento
-			bnode = newnode.parent
-			while bnode is not None:
-				if bnode.balance > 1 or bnode.balance < -1:
-					self.rebalance(bnode)
-				bnode = bnode.parent
-			####
+			# # Balanceamento
+			# bnode = newnode.parent
+			# while bnode is not None:
+			# 	if bnode.balance > 1 or bnode.balance < -1:
+			# 		self.rebalance(bnode)
+			# 	bnode = bnode.parent
+			# ####
 
 			arc = [newnode, lleaf, newnode2]
 
@@ -554,6 +554,7 @@ class BeachLine:
 		node.parent.stll = False
 		ev = node.event
 		node = node.parent
+		self.llist.append(node.value)
 		if node == self.root:
 			self.root = node.right
 			self.root.parent = None
@@ -570,6 +571,7 @@ class BeachLine:
 		node.parent.still = False
 		ev = node.event
 		node = node.parent
+		self.rlist.append(node.value)
 		if node == self.root:
 			self.root = node.left
 			self.root.parent = None

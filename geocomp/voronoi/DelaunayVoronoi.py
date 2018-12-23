@@ -75,7 +75,7 @@ class draw_circ_events:
 		if key not in self.points.keys():
 			self.points[key] = [None, 0]
 		if self.points[key][1] == 0:
-			self.points[key][0] = control.plot_disc(x,y,config.COLOR_ALT3,3)
+			self.points[key][0] = control.plot_disc(x,y,config.COLOR_PRIM,3)
 		self.points[key][1] = self.points[key][1] + 1
 
 	def rem_point(self,x,y):
@@ -202,6 +202,7 @@ def fortune(l, triang):
 			p2,q2 = Beach.llist[i+1]
 			x,y = lineIntersect(p1,q1,p2,q2)
 			if x is not None and x < Beach.bounds["minx"]:
+				Beach.llist[i+1] = [p1,q1]
 				if q1 == p2:
 					drawDelaunayEdge(p1.x,p1.y,q2.x,q2.y)
 				elif q1 == p1:
@@ -217,6 +218,7 @@ def fortune(l, triang):
 			p2,q2 = Beach.rlist[i+1]
 			x,y = lineIntersect(p1,q1,p2,q2)
 			if x is not None and x > Beach.bounds["maxx"]:
+				Beach.rlist[i+1] = [p1,q1]
 				if q1 == p2:
 					drawDelaunayEdge(p1.x,p1.y,q2.x,q2.y)
 				elif q1 == p1:
