@@ -19,7 +19,7 @@ class TNode:
 		self.event = None # Evento circulo relacionado ao arco
 		self.startp = None # Ponto inicial da linha a ser desenhada
 		self.still = True
-		self.pair = None # Para as arestas de Delaunay na borda
+		self.pair = None # Deprecated. Usado em algumas funções de teste
 
 	def __str__(self):
 		if isinstance(self.value, list):
@@ -68,6 +68,7 @@ class BeachLine:
 			return None
 		return cnode
 
+	# Insere um ponto (parábola) na árvore
 	def insere(self,value,c):
 		if self.root is None:
 			self.root = TNode(value)
@@ -153,22 +154,6 @@ class BeachLine:
 						else:
 							c_height = node.parent.balance
 				node = node.parent
-			# while node.parent is not None:
-			# 	if node.parent.left == node:
-			# 		node.parent.balance = node.parent.balance - c_height
-			# 		if node.parent.balance >= 0:
-			# 			c_height = 0
-			# 		else: 
-			# 			if node.parent.balance + c_height >= 0:
-			# 				c_height = -node.parent.balance
-			# 	else:
-			# 		node.parent.balance = node.parent.balance + c_height
-			# 		if node.parent.balance <= 0:
-			# 			c_height = 0
-			# 		else:
-			# 			if node.parent.balance - c_height  <= 0:
-			# 				c_height = node.parent.balance
-			# 	node = node.parent
 
 			# Balanceamento
 			bnode = newnode.parent
@@ -182,7 +167,7 @@ class BeachLine:
 
 			return [circleevents, removeEvent, arc]
 
-
+		# Buscando na árvore a posição para inserir o ponto
 		else:
 			p = node.value[0]
 			q = node.value[1]
@@ -264,6 +249,7 @@ class BeachLine:
 							print('erro? Nós internos repetidos 2')
 				cnode = cnode.parent
 
+			# Remove o ponto, e atualiza os apontadores
 			if low is None or high is None:
 				print('Erro. low ou high é None, ambos deviam ter valor')
 			high.value = [ant,prox]
@@ -282,6 +268,8 @@ class BeachLine:
 				low.parent.left = nroot
 			else:
 				low.parent.right = nroot
+
+			# Rebalanceia a árvore
 			bnode = nroot
 			variation = -1
 			while bnode.parent is not None:
@@ -304,7 +292,7 @@ class BeachLine:
 		# Precisa adicionar os eventos circulo da divisão nova (novo[0], novo[1], prox(novo[1])) (ant(novo[0]),novo[0],novo[1])
 		return [pred,suc,high]
 
-
+	# Após tratar um evento-círculo, busca novos eventos círculo que podem ter surgido.
 	def atualiza_eventos_circ(self,novo,liney,apred,asuc):
 		circleevents = []
 		removeevents = []
@@ -330,6 +318,7 @@ class BeachLine:
 			nxt = None
 		if ant is not None and (ant.value == p or ant.value == q or ant.value == apred.value[1]):
 			ant = None
+		# Procura o 'próximo' evento círculo
 		if nxt is not None:
 			q_leaf = self.prev_leaf(nxt)
 			lp = self.circleLowerPoint(nxt.value, p, q)
@@ -341,6 +330,7 @@ class BeachLine:
 					q_leaf.event = lp
 					circleevents.append(q_leaf)
 		
+		# Procura o evento-círculo 'anterior'
 		if ant is not None:
 			p_leaf = self.next_leaf(ant)
 			lp = self.circleLowerPoint(ant.value, p, q)
@@ -356,7 +346,8 @@ class BeachLine:
 
 
 
-	# Rebalanceia um nó por meio de rotações. Leva em conta o balance do nó para o rebalanceamento
+	# Rebalanceia um nó por meio de rotações. Leva em conta o balance do nó para o rebalanceamento.
+	# É possível que o balanço de um nó fique em [-3,+3], pela forma que a inserção funciona
 	# Invariante: Todos os nós nas sub-árvores de node estão balanceados
 	def rebalance(self, node):
 		nnode = None
@@ -515,6 +506,7 @@ class BeachLine:
 			else:
 				nparent.right = lchild
 
+	# Função auxiliar do balanceamento. Propaga as mudanças de balance após os balanceamentos
 	def propagate(self,node):
 		variation = 1
 		while node.parent is not None:
@@ -582,7 +574,7 @@ class BeachLine:
 			else:
 				return self.searchRec(value, node.right, c)
 
-	# Encontra a x-coordenada na intersecção de duas parabolas
+	# Encontra a x-coordenada na intersecção de duas parabolas. Perceba que a ordem de p e q devem estar em ordem (p deve descrever a parábola a esquerda da parábola de q)
 	def parabolaIntersectX(self, p, q, c): # p e q são os pontos que definem as duas parabolas, c é a y-coord da linha de varredura
 
 		# Casos degenerados
@@ -637,6 +629,7 @@ class BeachLine:
 		rad = math.sqrt((cx-p.x)*(cx-p.x)+(cy-p.y)*(cy-p.y))
 		return Ponto(cx,cy-rad,isPonto=False,center=Ponto(cx,cy))   # <<< A y-coord da linha de varredura diminui ao longo do alg
 
+	# Determina se a parábola mais a esquerda está fora da região visível
 	def left_out(self,c):
 		node = self.root
 		if node is None:
@@ -650,6 +643,7 @@ class BeachLine:
 				return True
 		return False
 
+	# Determina se a parábola mais a direita está fora da região visível
 	def right_out(self,c):
 		node = self.root
 		if node is None:
@@ -663,6 +657,7 @@ class BeachLine:
 				return True
 		return False
 
+	# Remove a parábola da esquerda, e rebalanceia a árvore
 	def remove_left(self):
 		node = self.root
 		while node.left is not None:
@@ -697,6 +692,7 @@ class BeachLine:
 				bnode = bnode.parent
 		return ev
 
+	# Remove a parábola da direita, e rebalanceia a árvore
 	def remove_right(self):
 		node = self.root
 		while node.right is not None:
@@ -731,6 +727,7 @@ class BeachLine:
 				bnode = bnode.parent
 		return ev
 
+	# Função que remove as parábolas que sairam da região visível
 	def trata_extremos(self,c):
 		if self.root is None:
 			return
@@ -768,6 +765,7 @@ class BeachLine:
 		id_list.append(line_id)
 		return id_list
 
+	# Desenha as arestas parciais.
 	def draw_partial(self,c):
 		if self.root is None:
 			return []
@@ -806,6 +804,7 @@ class BeachLine:
 			self.test_r2lprintrec(r.right)
 			return
 
+	# Função de teste. Imprime a árvore por uma busca BFS. E checa se o baçanceamento está correto
 	def test_bfsprint(self):
 		if self.root is None:
 			return
