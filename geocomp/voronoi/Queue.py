@@ -1,4 +1,4 @@
-from .heep import *
+from heapq import *
 from geocomp.common.segment import Segment
 from geocomp.common import control
 from geocomp.common.guiprim import *
@@ -36,17 +36,17 @@ class EventQueue:
 		self.isIn = {}
 
 	def put(self, item, key):
-		if (key.x, key.y) in self.isIn:
+		if (-key.x, -key.y) in self.isIn:
 			return
 		self.n += 1
-		inv = [item.y, item.x, item, True]
-		self.isIn[(key.x, key.y)] = inv
+		inv = [-item.y, -item.x, item, True]
+		self.isIn[(-key.x, -key.y)] = inv
 		heappush(self.fila, inv)
 
 	def take(self, key):
-		if (key.x, key.y) not in self.isIn:
+		if (-key.x, -key.y) not in self.isIn:
 			return
-		taken = self.isIn.pop((key.x, key.y))
+		taken = self.isIn.pop((-key.x, -key.y))
 		taken[-1] = False
 		self.n -= 1
 
@@ -56,184 +56,5 @@ class EventQueue:
 			key = item[2]
 			if item[-1]:
 				self.n -= 1
-				del self.isIn[(key.x, key.y)]
+				del self.isIn[(-key.x, -key.y)]
 				return key
-"""
-	def __init__(self):
-		self.root = None
-		self.size = 0
-		self.d = {}
-
-	def put(self, item, key):
-		if self.root is None:
-			self.root = Node(item, key)
-		else:
-			self.putRec(item, key, self.root)
-
-	def take(self, key):
-		if self.root is None:
-			return False
-		else:
-			self.takeRec(key, self.root)
-
-
-	def putRec(self, item, key, current, l, r):
-		if key.y < current.key.y:
-			if current.hasLeft():
-				self.putRec(item, key, current.left)
-			else:
-				current.left = Node(item, key)
-				current.left.left = l
-				current.left.right = r
-			return
-		if key.y > current.key.y:
-			if current.hasRight():
-				self.putRec(item, key, current.right)
-			else:
-				current.right = Node(item, key)
-				current.right.left = l
-				current.right.right = r
-			return
-		if key.x < current.key.x:
-			if current.hasLeft():
-				self.putRec(item, key, current.left)
-			else:
-				current.left = Node(item, key)
-				current.left.left = l
-				current.left.right = r
-		else:
-			if current.hasRight():
-				self.putRec(item, key, current.right)
-			else:
-				current.right = Node(item, key)
-				current.right.left = l
-				current.right.right = r
-
-
-	def putRec(self, item, key, current):
-		if key.y < current.key.y:
-			if current.hasLeft():
-				self.putRec(item, key, current.left)
-			else:
-				current.left = Node(item, key)
-			return
-		if key.y > current.key.y:
-			if current.hasRight():
-				self.putRec(item, key, current.right)
-			else:
-				current.right = Node(item, key)
-			return
-		if key.x < current.key.x:
-			if current.hasLeft():
-				self.putRec(item, key, current.left)
-			else:
-				current.left = Node(item, key)
-		else:
-			if current.hasRight():
-				self.putRec(item, key, current.right)
-			else:
-				current.right = Node(item, key)
-
-	def takeRec(self, key, current):
-		if key.y < current.key.y:
-			if current.hasLeft():
-				if key == current.left.key:
-					self.takeOut(current, current.left)
-				else:
-					self.takeRec(key, current.left)
-			else:
-				return False
-			return
-		if key.y > current.key.y:
-			if current.hasRight():
-				if key == current.right.key:
-					self.takeOut(current, current.right)
-				else:
-					self.takeRec(key, current.right)
-			else:
-				return False
-			return
-		if key.x < current.key.x:
-			if current.hasLeft():
-				if key == current.left.key:
-					self.takeOut(current, current.left)
-				else:
-					self.takeRec(key, current.left)
-			else:
-				return False
-		else:
-			if current.hasRight():
-				if key == current.right.key:
-					self.takeOut(current, current.right)
-				else:
-					self.takeRec(key, current.right)
-			else:
-				return False
-
-	def takeOut(self, parent, taken):
-		if taken.hasLeft() and taken.hasRight():
-			aux = taken.right
-			prev = taken
-			while aux.hasLeft():
-				prev = aux
-				aux = aux.left
-			if parent.left == taken:
-				parent.left = aux
-				prev.left = taken
-				auxl = taken.left
-				auxr = taken.right
-				taken.left = aux.left
-				taken.right = aux.right
-				aux.left = auxl
-				aux.right = auxr
-				self.takeOut(prev, taken)
-			if parent.right == taken:
-				parent.right = aux
-				prev.left = taken
-				auxl = taken.left
-				auxr = taken.right
-				taken.left = aux.left
-				taken.right = aux.right
-				aux.left = auxl
-				aux.right = auxr
-				self.takeOut(prev, taken)
-		else:
-			if taken.hasLeft():
-				if parent.left == taken:
-					parent.left = taken.left
-				if parent.right == taken:
-					parent.right = taken.left
-			else:
-				if parent.left == taken:
-					parent.left = taken.right
-				if parent.right == taken:
-					parent.right = taken.right
-
-
-	def takeHighest(self):
-		if self.root.hasRight():
-			prox = None
-			parent = self.root
-			taken = self.root.right
-			while taken.hasRight():
-				parent = taken
-				taken = taken.right
-			if taken.hasLeft():
-				prox = taken.left
-			parent.right = prox
-		else:
-			taken = self.root
-			self.root = self.root.left
-		return taken.item
-
-	def tp(self):
-		if self.root is not None:
-			self.tpr(self.root)
-
-	def tpr(self,node):
-		if node is None:
-			return
-		self.tpr(node.left)
-		print(node.item.x,node.item.y)
-		self.tpr(node.right)
-		"""

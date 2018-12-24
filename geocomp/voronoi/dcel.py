@@ -20,48 +20,6 @@ class dcel:
 		self.arestas = []
 		self.vertices = {}
 
-	# Determina duas arestas consecutivas com o ponto entre elas - Não usado no projeto
-	def between(self,p,q):
-		lp = self.vertices[(p.x,p.y)]
-		if len(lp) == 1:
-			return lp[0].twin, lp[0]
-		else:
-			for a in lp:
-				a = a.twin
-				b = a.prox
-				if prim.left(a.u,a.v,q) and prim.left(b.u,b.v,q):
-					return a,b
-
-	# Insere a aresta em um vértice, na posição correta em relação às outras arestas - Não usado no projeto
-	def insere(self,u,v,prox=None,ant=None):
-		a = aresta(u,v,prox=prox,ant=ant)
-		twin = aresta(v,u,twin=a,prox=ant,ant=prox)
-		a.twin = twin
-		pu = (u.x,u.y)
-		pv = (v.x,v.y)
-		if pu not in self.vertices.keys():
-			self.vertices[pu] = []  #edges that LEAVE u
-		if pv not in self.vertices.keys():
-			self.vertices[pv] = []  #edges that LEAVE v
-		lu = self.vertices[pu]
-		lv = self.vertices[pv]
-		if not lu:
-			twin.prox = a
-			a.ant = twin
-			lu.append(a)
-		else:
-			twin.prox, a.ant = self.between(u, v)
-			twin.prox.ant = twin
-			a.ant.prox = a
-		if not lv:
-			twin.ant = a
-			a.prox = twin 
-			lv.append(twin)
-		else:
-			a.prox, twin.ant = self.between(v, u)
-			twin.ant.prox = twin
-			a.prox.ant = a
-
 	# Função de comparação. Retorna True se edge1 está depois de edge2 em sentido horario ao redor do vértice u de edge1/edge2 (Que deve ser o mesmo). O intervalo começa e termina em "12h"
 	def greater(self,edge1,edge2):
 		e1 = [edge1.v.x-edge1.u.x,edge1.v.y-edge1.u.y]
