@@ -52,17 +52,7 @@ class EventQueue:
 
 	def put(self, item, key):
 		if (-key.x, -key.y) in self.isIn:
-			if type(self.isIn[(-key.x, -key.y)][-1]) is bool and self.isIn[(-key.x, -key.y)][2].isPonto:
-				return
-			else:
-				self.n+=1
-				inv = [-item.y, -item.x, item, True]
-				if type(self.isIn[(-key.x, -key.y)][-1]) is bool:
-					self.isIn[(-key.x, -key.y)] = [self.isIn[(-key.x, -key.y)], inv]
-				else:
-					self.isIn[(-key.x, -key.y)].append(inv)
-				heappush(self.fila, inv)
-				return
+			return
 		self.n += 1
 		inv = [-item.y, -item.x, item, True]
 		self.isIn[(-key.x, -key.y)] = inv
@@ -72,17 +62,7 @@ class EventQueue:
 		if (-key.x, -key.y) not in self.isIn:
 			return
 		taken = self.isIn.pop((-key.x, -key.y))
-		if type(taken[-1]) is bool:
-			taken[-1] = False
-		else:
-			taken[0][-1] = False
-			aux = []
-			for i in range(1, len(taken)):
-				aux.append(taken[i])
-			if len(aux) == 1:
-				self.isIn[(-key.x, -key.y)] = aux[0]
-			else:
-				self.isIn[(-key.x, -key.y)] = aux
+		taken[-1] = False
 		self.n -= 1
 
 	def takeHighest(self):
@@ -91,14 +71,5 @@ class EventQueue:
 			key = item[2]
 			if item[-1]:
 				self.n -= 1
-				if type(self.isIn[(-key.x, -key.y)][-1]) is bool:
-					del self.isIn[(-key.x, -key.y)]
-				else:
-					aux = []
-					for i in range(1, len(self.isIn[(-key.x, -key.y)])):
-						aux.append(self.isIn[(-key.x, -key.y)][i])
-					if len(aux) == 1:
-						self.isIn[(-key.x, -key.y)] = aux[0]
-					else:
-						self.isIn[(-key.x, -key.y)] = aux
+				del self.isIn[(-key.x, -key.y)]
 				return key

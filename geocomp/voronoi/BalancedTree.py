@@ -121,18 +121,20 @@ class BeachLine:
 			if cnode is not None:
 				lp = self.circleLowerPoint(cnode.value, node.value, value)
 				if lp is not None:
-					lp.leaf = rleaf
-					rleaf.event = lp 
-					circleevents.append(rleaf)
+					if lp.x >= value.x:
+						lp.leaf = rleaf
+						rleaf.event = lp 
+						circleevents.append(rleaf)
 
 			# Encontra o node 'anterior', para termos as triplas que determinam eventos-circulo
 			cnode = self.prev_leaf(newnode)
 			if cnode is not None:
 				lp = self.circleLowerPoint(cnode.value, node.value, value)
 				if lp is not None:
-					lp.leaf = node
-					node.event = lp
-					circleevents.append(node)
+					if lp.x <= value.x:
+						lp.leaf = node
+						node.event = lp
+						circleevents.append(node)
 
 			####
 			#Propagar as mudanças de balance
@@ -323,7 +325,7 @@ class BeachLine:
 			q_leaf = self.prev_leaf(nxt)
 			lp = self.circleLowerPoint(nxt.value, p, q)
 			if lp is not None:
-				if lp.center.y <= novo.startp.y:
+				if lp.center.x >= novo.startp.x:
 					if q_leaf.event is not None:
 						removeevents.append(q_leaf.event)
 					lp.leaf = q_leaf
@@ -335,7 +337,7 @@ class BeachLine:
 			p_leaf = self.next_leaf(ant)
 			lp = self.circleLowerPoint(ant.value, p, q)
 			if lp is not None:
-				if lp.center.y <= novo.startp.y:
+				if lp.center.x <= novo.startp.x:
 					if p_leaf.event is not None:
 						removeevents.append(p_leaf.event)
 					lp.leaf = p_leaf
